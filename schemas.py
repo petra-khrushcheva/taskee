@@ -1,49 +1,49 @@
-from datetime import date
-from typing import Union, Optional
-from enum import Enum
-from uuid import UUID, uuid4
+# from datetime import date, datetime
+# from typing import Union, Optional
+# from enum import Enum
+# from uuid import UUID, uuid4
 
-from pydantic import BaseModel, EmailStr
-
-
-# описывает, что позволено отправлять в наш api
-class TaskBaseSchema(BaseModel):
-    title: str
-    description: Union[str, None] = None
-    # status: TaskStatus
-    # deadline:  Union[date, None] = None #ограничение, не раньше даты создания
-    # workspace
-    # created_by
-    # assigned to
+# from pydantic import BaseModel, EmailStr
 
 
-class TaskCreateSchema(TaskBaseSchema):
-    pass
+# # описывает, что позволено отправлять в наш api
+# class TaskBaseSchema(BaseModel):
+#     title: str
+#     description: Union[str, None] = None
+#     # status: TaskStatus
+#     # deadline:  Union[date, None] = None #ограничение, не раньше даты создания
+#     # workspace
+#     # created_by
+#     # assigned to
 
 
-class TaskSchema(TaskBaseSchema):
-    uuid: Optional[UUID] = uuid4
-    # time_created: date
-
-    class Config:
-        orm_mode = True
+# class TaskCreateSchema(TaskBaseSchema):
+#     pass
 
 
-# class TaskStatus(str, Enum):
-#     new = 'new'
-#     wip = 'WIP'
-#     done = 'done'
+# class TaskSchema(TaskBaseSchema):
+#     uuid: Optional[UUID] = uuid4
+#     # time_created: datetime
+
+#     class Config:
+#         orm_mode = True
 
 
-# class Role(str, Enum):
-#     boss = 'boss'
-#     not_a_boss = 'not_a_boss'
+# # class TaskStatus(str, Enum):
+# #     new = 'new'
+# #     wip = 'WIP'
+# #     done = 'done'
 
 
-# class User(BaseModel):
-#     id: Optional[UUID] = uuid4()
-#     username: str
-#     first_name: Union[str, None] = None
-#     last_name: Union[str, None] = None
-#     role: Union[Role, None] = None
-#     email: EmailStr
+# # class Role(str, Enum):
+# #     boss = 'boss'
+# #     not_a_boss = 'not_a_boss'
+
+
+# # class User(BaseModel):
+# #     id: Optional[UUID] = uuid4()
+# #     username: str
+# #     first_name: Union[str, None] = None
+# #     last_name: Union[str, None] = None
+# #     role: Union[Role, None] = None
+# #     email: EmailStr

@@ -1,11 +1,73 @@
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
-from sqlalchemy.orm import relationship
-from sqlalchemy.sql import func
-from sqlalchemy.dialects.postgresql import UUID
-from uuid import uuid4
-from enum import Enum
+from typing import Optional
+from uuid import uuid4, UUID
+from sqlmodel import SQLModel, Field
 
-from database import Base
+
+class TaskBase(SQLModel):
+    title: str
+    description: str
+
+
+class Task(TaskBase, table=True):
+    uuid: UUID = Field(default_factory=uuid4, primary_key=True)
+
+
+class TaskCreate(TaskBase):
+    pass
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# from datetime import datetime
+# from sqlalchemy import TIMESTAMP, Column, DateTime, ForeignKey, Integer, String, Text
+# from sqlalchemy.orm import relationship
+# from sqlalchemy.sql import func
+
+# from enum import Enum
+
+# from database import Base
+
+
+
+
+
+
+    
+    # time_created = Column(TIMESTAMP, default=datetime.utcnow)
+    
+    # status = Column(Enum(TaskStatus), default=TaskStatus.new)
+    # deadline = Column(DateTime)
+    # workspace
+    # created_by = Column(UUID, ForeignKey(user.uuid))
+    # updated_at = Column(DateTime, default=datetime.datetime.utcnow,
+    # server_default=text('now()', onupdate=datetime.datetime.now)
+    # ispolnitel_id = Column(UUID, ForeignKey("users.uuid"))
+
+    # ispolnitel = relationship("User", back_populates="tasks")
 
 
 # class TaskStatus(Enum):
@@ -19,22 +81,7 @@ from database import Base
 #     not_a_boss = 'not_a_boss'
 
 
-class Task(Base):
-    __tablename__ = "tasks"
 
-    uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    title = Column(String)
-    description = Column(Text)
-    # status = Column(Enum(TaskStatus), default=TaskStatus.new)
-    # time_created = Column(DateTime(timezone=True), server_default=func.now())
-    # deadline = Column(DateTime)
-    # workspace
-    # created_by = Column(UUID, ForeignKey(user.uuid))
-    # updated_at = Column(DateTime, default=datetime.datetime.now,
-    # server_default=text('now()', onupdate=datetime.datetime.now)
-    # ispolnitel_id = Column(UUID, ForeignKey("users.uuid"))
-
-    # ispolnitel = relationship("User", back_populates="tasks")
 
 
 # class UserModel(Base):
