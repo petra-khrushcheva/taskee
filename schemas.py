@@ -6,8 +6,8 @@ from uuid import UUID, uuid4
 from pydantic import BaseModel, EmailStr
 
 
+# описывает, что позволено отправлять в наш api
 class TaskBaseSchema(BaseModel):
-    # описывает, что позволено отправлять в наш api
     title: str
     description: Union[str, None] = None
     # status: TaskStatus

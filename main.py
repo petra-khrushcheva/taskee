@@ -1,38 +1,45 @@
-import uvicorn
-from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
 from uuid import UUID
-import crud, models, schemas
+
+import uvicorn
+from fastapi import Depends, FastAPI, HTTPException
+from sqlalchemy.ext.asyncio import AsyncSession
+
+import crud
+import models
+import schemas
 from database import SessionLocal, engine
 
-models.Base.metadata.create_all(bind=engine)
+# models.Base.metadata.create_all(bind=engine) нужно удалить потомучто async
 
 app = FastAPI()
 
 
-def get_db():
+async def get_db():
+    async with engine.begin() as conn:
+        await conn.run_sync(models.Base.metadata.create_all)
     db = SessionLocal()
     try:
         yield db
     finally:
-        db.close()
+        await db.close()
 
 
 @app.get("/tasks/", response_model=list[schemas.TaskSchema])
-def read_items(db: Session = Depends(get_db)):
-    items = crud.get_tasks(db)
+async def read_items(db: AsyncSession = Depends(get_db)):
+    items = await crud.get_tasks(db)
     return items
 
 
 @app.post("/tasks/", response_model=schemas.TaskSchema)
-def create_item(
-    item: schemas.TaskCreateSchema, db: Session = Depends(get_db)
+async def create_item(
+    item: schemas.TaskCreateSchema, db: AsyncSession = Depends(get_db)
 ):
-    return crud.create_task(db=db, item=item)
+    result = await crud.create_task(db=db, item=item)
+    return result
 
 
 @app.get("/tasks/{task_id}", response_model=schemas.TaskSchema)
-def read_item(task_id: UUID, db: Session = Depends(get_db)):
+async def read_item(task_id: UUID, db: AsyncSession = Depends(get_db)):
     db_task = crud.get_task(db, task_id=task_id)
     if db_task is None:
         raise HTTPException(status_code=404, detail="Task not found")

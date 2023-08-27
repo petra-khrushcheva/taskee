@@ -20,7 +20,7 @@ from database import Base
 
 
 class Task(Base):
-    __tablename__ = "task"
+    __tablename__ = "tasks"
 
     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     title = Column(String)
@@ -38,7 +38,7 @@ class Task(Base):
 
 
 # class UserModel(Base):
-#     __tablename__ = "user"
+#     __tablename__ = "users"
 
 #     uuid = Column(UUID(as_uuid=True), primary_key=True, default=uuid4)
     # username = Column(String, unique=True)

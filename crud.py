@@ -1,25 +1,27 @@
 from uuid import UUID
 
 from sqlalchemy.orm import Session
-
+from sqlalchemy import select
 import models
 import schemas
 
 
-def get_task(db: Session, task_id: UUID):
+async def get_task(db: Session, task_id: UUID):
     return db.query(models.Task).filter(models.Task.uuid == task_id).first()
 
 
-def create_task(db: Session, item: schemas.TaskCreateSchema):
+async def create_task(db: Session, item: schemas.TaskCreateSchema):
     task = models.Task(**item.model_dump())
     db.add(task)
-    db.commit()
-    db.refresh(task)
+    await db.commit()
+    await db.refresh(task)
     return task
 
 
-def get_tasks(db: Session):
-    return db.query(models.TaskModel).all()
+async def get_tasks(db: Session):
+    result = await db.execute(select(models.Task))
+    tasks = result.scalars().all()
+    return tasks
 
 
 # def get_user_by_email(db: Session, email: str):
