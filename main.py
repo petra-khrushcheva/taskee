@@ -3,7 +3,7 @@ from fastapi import FastAPI, Depends
 from sqlalchemy.future import select
 
 from database import get_session
-from models import Task, TaskCreate
+from tasks.models import Task, TaskCreate
 from sqlalchemy.ext.asyncio import AsyncSession
 
 app = FastAPI()

@@ -1,21 +1,19 @@
 import asyncio
-from logging.config import fileConfig
 import os
 import sys
-from dotenv import load_dotenv
-
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import AsyncEngine
-from sqlmodel import SQLModel
+from logging.config import fileConfig
 
 from alembic import context
+from dotenv import load_dotenv
+from sqlalchemy import engine_from_config, pool
+from sqlalchemy.ext.asyncio import AsyncEngine
+from sqlmodel import SQLModel
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 sys.path.append(BASE_DIR)
 
-from models import Task
+from tasks.models import Task
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

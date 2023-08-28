@@ -3,6 +3,8 @@ from uuid import uuid4, UUID
 from sqlmodel import SQLModel, Field
 
 
+
+
 class TaskBase(SQLModel):
     title: str
     description: str
@@ -49,16 +51,11 @@ class TaskCreate(TaskBase):
 
 # from enum import Enum
 
-# from database import Base
 
 
 
-
-
-
-    
     # time_created = Column(TIMESTAMP, default=datetime.utcnow)
-    
+
     # status = Column(Enum(TaskStatus), default=TaskStatus.new)
     # deadline = Column(DateTime)
     # workspace
@@ -95,3 +92,53 @@ class TaskCreate(TaskBase):
 #     role = Column(Enum(Role), default=TaskStatus.not_a_boss)
 #     tasks = relationship("Task", back_populates="ispolnitel")
 #     workspaces = relationship("Workspace", back_populates="participant")
+
+# from datetime import date, datetime
+# from typing import Union, Optional
+# from enum import Enum
+# from uuid import UUID, uuid4
+
+# from pydantic import BaseModel, EmailStr
+
+
+# # описывает, что позволено отправлять в наш api
+# class TaskBaseSchema(BaseModel):
+#     title: str
+#     description: Union[str, None] = None
+#     # status: TaskStatus
+#     #deadline: Union[date, None] = None #ограничение, не раньше даты создания
+#     # workspace
+#     # created_by
+#     # assigned to
+
+
+# class TaskCreateSchema(TaskBaseSchema):
+#     pass
+
+
+# class TaskSchema(TaskBaseSchema):
+#     uuid: Optional[UUID] = uuid4
+#     # time_created: datetime
+
+#     class Config:
+#         orm_mode = True
+
+
+# # class TaskStatus(str, Enum):
+# #     new = 'new'
+# #     wip = 'WIP'
+# #     done = 'done'
+
+
+# # class Role(str, Enum):
+# #     boss = 'boss'
+# #     not_a_boss = 'not_a_boss'
+
+
+# # class User(BaseModel):
+# #     id: Optional[UUID] = uuid4()
+# #     username: str
+# #     first_name: Union[str, None] = None
+# #     last_name: Union[str, None] = None
+# #     role: Union[Role, None] = None
+# #     email: EmailStr
