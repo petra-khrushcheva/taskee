@@ -17,8 +17,17 @@ class Task(TaskBase, table=True):
 class TaskCreate(TaskBase):
     pass
 
+    # time_created = Column(TIMESTAMP, default=datetime.utcnow)
 
+    # status = Column(Enum(TaskStatus), default=TaskStatus.new)
+    # deadline = Column(DateTime)
+    # workspace
+    # created_by = Column(UUID, ForeignKey(user.uuid))
+    # updated_at = Column(DateTime, default=datetime.datetime.utcnow,
+    # server_default=text('now()', onupdate=datetime.datetime.now)
+    # ispolnitel_id = Column(UUID, ForeignKey("users.uuid"))
 
+    # ispolnitel = relationship("User", back_populates="tasks")
 
 
 

@@ -2,7 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-import models
+import tasks.models as models
 import schemas
 
 
