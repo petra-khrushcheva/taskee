@@ -1,4 +1,4 @@
-version: "3"
+version: "3.9"
 
 services:
 
@@ -12,6 +12,9 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_PASSWORD=${DB_PASSWORD}
       - POSTGRES_DB=${DB_NAME}
+    # volumes:
+    #   - pgdata:/var/lib/postgresql/data
+
 
   pgadmin:
     container_name: pgadmin
@@ -24,15 +27,23 @@ services:
     depends_on:
       - db
 
-  app:
-    container_name: app
+  taskee-backend:
+    container_name: taskee-backend
     build: .
-    command: bash -c "alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
+    image: taskee-backend
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - DATABASE_URL=${DATABASE_URL}
+    command: bash -c "cd taskee-backend && alembic upgrade head && uvicorn main:app --host 0.0.0.0 --port 8000 --reload"
     volumes:
-      - .:/app
+      - ./taskee-backend:/app/taskee-backend
     ports:
       - 8000:8000
     depends_on:
       - db
     restart: always
 
+# volumes:
+#   pgdata:
