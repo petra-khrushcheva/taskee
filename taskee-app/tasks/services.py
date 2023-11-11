@@ -1,8 +1,8 @@
-from tasks import schemas
-from tasks.models import Task
-from sqlalchemy import select, desc
+from sqlalchemy import desc, select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
+from tasks import schemas
+from tasks.models import Task
 
 
 async def get_tasks(session: AsyncSession):

@@ -1,9 +1,8 @@
 import enum
 
+from basemodels import Base
 from sqlalchemy import String, Text
 from sqlalchemy.orm import Mapped, mapped_column
-
-from basemodels import Base
 
 
 class TaskStatus(enum.Enum):

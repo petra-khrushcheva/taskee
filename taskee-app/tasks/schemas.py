@@ -1,10 +1,9 @@
-from annotated_types import MaxLen
 from datetime import datetime
 from typing import Annotated
 from uuid import UUID
 
+from annotated_types import MaxLen
 from pydantic import BaseModel
-
 from tasks.models import TaskStatus
 
 

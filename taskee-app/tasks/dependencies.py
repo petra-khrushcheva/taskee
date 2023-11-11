@@ -1,9 +1,8 @@
 from typing import Annotated
 
+from database import get_session
 from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from database import get_session
 from tasks import services
 
 
