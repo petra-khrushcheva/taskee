@@ -3,14 +3,14 @@ from typing import Annotated
 from database import get_session
 from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from tasks import services
+from tasks.services import TaskCRUD
 
 
 async def get_task_by_id(
         id: Annotated[int, Path],
         session: AsyncSession = Depends(get_session)
 ):
-    task = await services.get_task(session=session, id=id)
+    task = await TaskCRUD.get_task(session=session, id=id)
     if task is not None:
         return task
     raise HTTPException(
