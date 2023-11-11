@@ -12,6 +12,8 @@ class TaskStatus(enum.Enum):
 
 
 class Task(Base):
+    __tablename__ = 'tasks'
+
     title: Mapped[str] = mapped_column(String(50))
     description: Mapped[str] = mapped_column(Text)
     status: Mapped[TaskStatus]
