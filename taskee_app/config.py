@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     db_password: str
     db_username: str
     db_echo: bool
-    # secret_key: str
+    secret_key: str
 
     class Config:
         env_file = f"{os.path.dirname(os.path.abspath(__file__))}/../.env"

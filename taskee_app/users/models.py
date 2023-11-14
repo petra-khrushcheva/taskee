@@ -3,4 +3,7 @@ from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
-    pass
+    __tablename__ = "users"
+# first name
+# last name
+# property full name

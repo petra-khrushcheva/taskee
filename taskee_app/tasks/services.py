@@ -1,8 +1,8 @@
 from sqlalchemy import desc, select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from tasks.schemas import TaskCreate
 from tasks.models import Task
+from tasks.schemas import TaskCreate
 
 
 class TaskCRUD():
