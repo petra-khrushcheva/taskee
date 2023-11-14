@@ -18,12 +18,22 @@ class Task(Base):
     title: Mapped[str] = mapped_column(String(50))
     description: Mapped[str] = mapped_column(Text)
     status: Mapped[TaskStatus]
-    creator_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"),
-                                                  nullable=False)
-    executor_id: Mapped[uuid.UUID | None] = mapped_column(ForeignKey("users.id"),
-                                                          nullable=False)
+    creator_id: Mapped[uuid.UUID] = mapped_column(
+        ForeignKey("users.id", ondelete='RESTRICT'),
+        nullable=False,
+    )
+    executor_id: Mapped[uuid.UUID | None] = mapped_column(
+        ForeignKey("users.id", ondelete='SET NULL',),
+        nullable=False
+    )
 
-    creator: Mapped["User"] = relationship(back_populates='created_tasks')
-    executor: Mapped["User"] = relationship(back_populates='appointed_tasks')
+    creator: Mapped["User"] = relationship(
+        back_populates='created_tasks',
+        foreign_keys=[creator_id]
+    )
+    executor: Mapped["User"] = relationship(
+        back_populates='appointed_tasks',
+        foreign_keys=[executor_id]
+    )
 
     # deadline

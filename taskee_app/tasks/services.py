@@ -1,4 +1,5 @@
 from sqlalchemy import desc, select
+from sqlalchemy.orm import  joinedload
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from tasks.models import Task
@@ -9,7 +10,11 @@ class TaskCRUD():
 
     @staticmethod
     async def get_tasks(session: AsyncSession):
-        stmt = select(Task).order_by(desc(Task.created_at))
+        stmt = (select(Task)
+                .options(
+                    joinedload(Task.creator),
+                    joinedload(Task.executor),
+                ).order_by(desc(Task.created_at)))
         result: Result = await session.execute(stmt)
         tasks = result.scalars().all()
         return tasks

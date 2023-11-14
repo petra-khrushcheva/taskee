@@ -12,10 +12,12 @@ class User(SQLAlchemyBaseUserTableUUID, Base):
     last_name: Mapped[str] = mapped_column(String(50))
 
     created_tasks: Mapped[List["Task"]] = relationship(
-        back_populates="creator"
+        back_populates="creator",
+        foreign_keys='Task.creator_id'
     )
     appointed_tasks: Mapped[List["Task"]] = relationship(
-        back_populates="executor"
+        back_populates="executor",
+        foreign_keys='Task.executor_id'
     )
 
     @property
