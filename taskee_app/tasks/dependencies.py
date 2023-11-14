@@ -1,4 +1,5 @@
 from typing import Annotated
+from uuid import UUID
 
 from database import get_session
 from fastapi import Depends, HTTPException, Path, status
@@ -7,7 +8,7 @@ from tasks.services import TaskCRUD
 
 
 async def get_task_by_id(
-        id: Annotated[int, Path],
+        id: Annotated[UUID, Path],
         session: AsyncSession = Depends(get_session)
 ):
     task = await TaskCRUD.get_task(session=session, id=id)

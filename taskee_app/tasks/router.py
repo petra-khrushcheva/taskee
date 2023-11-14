@@ -39,7 +39,7 @@ async def delete_task(
     task: Task = Depends(get_task_by_id),
     session: AsyncSession = Depends(get_session)
 ):
-    await TaskCRUD.delete_task(session=session, task=task)
+    return await TaskCRUD.delete_task(session=session, task=task)
 
 
 @router.put('/{id}',
@@ -48,4 +48,6 @@ async def delete_task(
 async def update_task(task_data: schemas.TaskCreate,
                       task: Task = Depends(get_task_by_id),
                       session: AsyncSession = Depends(get_session)):
-    await TaskCRUD.update_task(session=session, task=task, task_data=task_data)
+    return await TaskCRUD.update_task(session=session,
+                                      task=task,
+                                      task_data=task_data)

@@ -19,8 +19,8 @@ class TaskCRUD():
         return await session.get(Task, id)
 
     @staticmethod
-    async def create_task(session: AsyncSession, post_data: TaskCreate):
-        task = Task(**post_data.model_dump())
+    async def create_task(session: AsyncSession, task_data: TaskCreate):
+        task = Task(**task_data.model_dump())
         session.add(task)
         await session.commit()
         await session.refresh(task)
