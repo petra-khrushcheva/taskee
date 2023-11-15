@@ -1,7 +1,51 @@
+import enum
+from uuid import UUID
+from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from basemodels import Base
 
 
 class Workspace(Base):
-    name: Mapped[str]
+    __tablename__ = "workspaces"
+
+    name: Mapped[str] = mapped_column(String(50))
+
+    users: Mapped[list['WorkspaceUserAssociation']] = relationship(
+        back_populates='workspace'
+    )
+
+
+class GroupRole(enum.Enum):
+    admin = 'admin'
+    user = 'user'
+    reader = 'reader'
+
+
+class WorkspaceUserAssociation(Base):
+    __tablename__ = "workspace_user_association"
+    __table_args__ = (
+        UniqueConstraint(
+            "user_id",
+            "workspace_id",
+            name="unique_workspace_user",
+        ),
+    )
+
+    workspace_id: Mapped[UUID] = mapped_column(
+        ForeignKey('workspaces.id', ondelete='CASCADE'),
+        nullable=False
+    )
+    user_id: Mapped[UUID] = mapped_column(
+        ForeignKey('users.id', ondelete='CASCADE'),
+        nullable=False
+    )
+    role: Mapped[GroupRole]
+
+    workspace: Mapped["Workspace"] = relationship(
+        back_populates="users",
+    )
+
+    user: Mapped["User"] = relationship(
+        back_populates="workspaces",
+    )

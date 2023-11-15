@@ -1,5 +1,5 @@
 from sqlalchemy import desc, select
-from sqlalchemy.orm import  joinedload
+from sqlalchemy.orm import joinedload
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from tasks.models import Task

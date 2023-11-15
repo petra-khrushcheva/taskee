@@ -9,6 +9,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 from tasks.models import Task
 from users.models import User
+from workspaces.models import Workspace, WorkspaceUserAssociation
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

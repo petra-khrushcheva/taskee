@@ -19,12 +19,11 @@ class Task(Base):
     description: Mapped[str] = mapped_column(Text)
     status: Mapped[TaskStatus]
     creator_id: Mapped[uuid.UUID] = mapped_column(
-        ForeignKey("users.id", ondelete='RESTRICT'),
-        nullable=False,
+        ForeignKey("users.id", ondelete='CASCADE'),
+        nullable=False
     )
     executor_id: Mapped[uuid.UUID | None] = mapped_column(
-        ForeignKey("users.id", ondelete='SET NULL',),
-        nullable=False
+        ForeignKey("users.id", ondelete='SET NULL',)
     )
 
     creator: Mapped["User"] = relationship(
