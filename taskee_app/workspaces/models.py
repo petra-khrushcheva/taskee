@@ -14,6 +14,7 @@ class Workspace(Base):
     users: Mapped[list['WorkspaceUserAssociation']] = relationship(
         back_populates='workspace'
     )
+    tasks: Mapped[list['Task']] = relationship(back_populates='workspace')
 
 
 class GroupRole(enum.Enum):
