@@ -1,6 +1,6 @@
 import os
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -12,8 +12,9 @@ class Settings(BaseSettings):
     db_echo: bool
     secret_key: str
 
-    class Config:
-        env_file = f"{os.path.dirname(os.path.abspath(__file__))}/../.env"
+    model_config = SettingsConfigDict(
+        env_file=f"{os.path.dirname(os.path.abspath(__file__))}/../.env"
+    )
 
     @property
     def DATABASE_URL(self):

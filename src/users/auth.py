@@ -1,6 +1,7 @@
-from config import settings
 from fastapi_users.authentication import (AuthenticationBackend,
                                           BearerTransport, JWTStrategy)
+
+from core.config import settings
 
 SECRET = settings.secret_key
 

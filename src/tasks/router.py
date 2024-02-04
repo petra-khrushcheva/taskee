@@ -1,9 +1,10 @@
 from typing import List
 
-import tasks.schemas as schemas
-from database import get_session
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
+import tasks.schemas as schemas
+from core.database import get_session
 from tasks.dependencies import get_task_by_id
 from tasks.models import Task
 from tasks.services import TaskCRUD

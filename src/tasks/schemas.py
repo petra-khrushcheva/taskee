@@ -1,11 +1,12 @@
 from datetime import datetime
-from typing import Annotated, Optional
+from typing import Annotated
 from uuid import UUID
 
 from annotated_types import MaxLen
-from pydantic import BaseModel
-from users.schemas import UserRead
+from pydantic import BaseModel, ConfigDict
+
 from tasks.models import TaskStatus
+from users.schemas import UserRead
 
 
 class TaskBase(BaseModel):
@@ -17,14 +18,14 @@ class TaskBase(BaseModel):
 
 class TaskCreate(TaskBase):
     creator_id: UUID
-    executor_id: Optional[UUID] = None
+    executor_id: UUID | None = None
 
 
 class Task(TaskBase):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     created_at: datetime
     creator: UserRead
-    executor: Optional[UserRead]
-
-    class Config:
-        from_attributes = True
+    # creator: "UserRead" теоретически это должно работать без импорта, я хз как но надо проверить
+    executor: UserRead | None = None

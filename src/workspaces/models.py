@@ -1,9 +1,10 @@
 import enum
 from uuid import UUID
+
 from sqlalchemy import ForeignKey, String, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from basemodels import Base
+from core.basemodels import Base
 
 
 class Workspace(Base):
@@ -15,6 +16,12 @@ class Workspace(Base):
         back_populates='workspace'
     )
     tasks: Mapped[list['Task']] = relationship(back_populates='workspace')
+    # tasks_new: Mapped[list['Task']] = relationship(
+    #     back_populates='workspace',
+    #     primaryjoin='and_(Workspace.id == Task.workspace_id, Task.status == "new")',
+    #     order_by='Task.created_at.desc()'
+    #     )
+    # для примера как создавать ограничение на уровне relationship
 
 
 class GroupRole(enum.Enum):

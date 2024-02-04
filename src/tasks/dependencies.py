@@ -1,9 +1,10 @@
 from typing import Annotated
 from uuid import UUID
 
-from database import get_session
 from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from core.database import get_session
 from tasks.services import TaskCRUD
 
 

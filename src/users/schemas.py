@@ -1,8 +1,8 @@
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, EmailStr
 from fastapi_users.schemas import CreateUpdateDictModel
+from pydantic import BaseModel, EmailStr
 
 
 class UserCreate(CreateUpdateDictModel):
