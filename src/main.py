@@ -3,9 +3,11 @@ from fastapi import FastAPI
 from tasks.router import router as tasks_router
 from users.router import router as users_router
 from workspaces.router import router as workspace_router
+from core.config import settings
 
 app = FastAPI(
-    title='Taskee - таск трекер'
+    title=settings.project_name,
+    version=settings.version
 )
 
 app.include_router(tasks_router)

@@ -10,10 +10,14 @@ class Settings(BaseSettings):
     db_password: str
     db_username: str
     db_echo: bool
+
     secret_key: str
 
+    project_name: str
+    version: str
+
     model_config = SettingsConfigDict(
-        env_file=f"{os.path.dirname(os.path.abspath(__file__))}/../.env"
+        env_file=f"{os.path.dirname(os.path.abspath(__file__))}/../../.env"
     )
 
     @property
