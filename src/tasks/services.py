@@ -27,13 +27,11 @@ class TaskCRUD():
     @staticmethod
     async def create_task(session: AsyncSession, task_data: TaskCreate):
         task = Task(**task_data.model_dump())
+        # task.creator = ... или task = Post(creator_id=current_user.id, **task_data.model_dump())
         session.add(task)
         await session.commit()
         await session.refresh(task)
         return task
-
-# добавлять создателя поста, когда будут готовы users
-# new_post = Post(owner_id=current_user.id, **post.model_dump())
 
     @staticmethod
     async def delete_task(session: AsyncSession, task: Task):

@@ -2,7 +2,7 @@ from typing import Optional
 from uuid import UUID
 
 from fastapi_users.schemas import CreateUpdateDictModel
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 
 class UserCreate(CreateUpdateDictModel):
@@ -20,8 +20,7 @@ class UserUpdate(CreateUpdateDictModel):
 
 
 class UserRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: UUID
     full_name: str
-
-    class Config:
-        from_attributes = True

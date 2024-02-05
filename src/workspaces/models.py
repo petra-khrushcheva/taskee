@@ -1,7 +1,7 @@
 import enum
 from uuid import UUID
 
-from sqlalchemy import ForeignKey, String, UniqueConstraint
+from sqlalchemy import ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from core.basemodels import Base
@@ -11,23 +11,29 @@ class Workspace(Base):
     __tablename__ = "workspaces"
 
     name: Mapped[str] = mapped_column(String(50))
+    description: Mapped[str] = mapped_column(Text)
 
-    users: Mapped[list['WorkspaceUserAssociation']] = relationship(
-        back_populates='workspace'
+    users: Mapped[list["WorkspaceUserAssociation"]] = relationship(
+        back_populates="workspace"
     )
-    tasks: Mapped[list['Task']] = relationship(back_populates='workspace')
-    # tasks_new: Mapped[list['Task']] = relationship(
-    #     back_populates='workspace',
-    #     primaryjoin='and_(Workspace.id == Task.workspace_id, Task.status == "new")',
-    #     order_by='Task.created_at.desc()'
-    #     )
-    # для примера как создавать ограничение на уровне relationship
+    tasks: Mapped[list["Task"]] = relationship(back_populates="workspace")
 
 
 class GroupRole(enum.Enum):
-    admin = 'admin'
-    user = 'user'
-    reader = 'reader'
+    """
+    Admin has permission to edit and delete workspace, add/delete users to
+    workspace and update their role in a group. + All User/Reader Permissions
+
+    User has permission to add tasks to the workspaces they are members of,
+    edit tasks they created. + All Reader permissions
+
+    Reader has permission to read all tasks in workspaces they are member of
+    and see the list of workspace users.
+    """
+
+    admin = "admin"
+    user = "user"
+    reader = "reader"
 
 
 class WorkspaceUserAssociation(Base):
@@ -41,14 +47,12 @@ class WorkspaceUserAssociation(Base):
     )
 
     workspace_id: Mapped[UUID] = mapped_column(
-        ForeignKey('workspaces.id', ondelete='CASCADE'),
-        nullable=False
+        ForeignKey("workspaces.id", ondelete="CASCADE"), nullable=False
     )
     user_id: Mapped[UUID] = mapped_column(
-        ForeignKey('users.id', ondelete='CASCADE'),
-        nullable=False
+        ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    role: Mapped[GroupRole]
+    user_role: Mapped[GroupRole] = mapped_column(server_default=GroupRole.user.value)
 
     workspace: Mapped["Workspace"] = relationship(
         back_populates="users",
