@@ -1,4 +1,5 @@
 import enum
+from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, String, Text, UniqueConstraint
@@ -11,7 +12,7 @@ class Workspace(Base):
     __tablename__ = "workspaces"
 
     name: Mapped[str] = mapped_column(String(50))
-    description: Mapped[str] = mapped_column(Text)
+    description: Mapped[Optional[str]] = mapped_column(Text)
 
     users: Mapped[list["WorkspaceUserAssociation"]] = relationship(
         back_populates="workspace"
@@ -21,8 +22,9 @@ class Workspace(Base):
 
 class GroupRole(enum.Enum):
     """
-    Admin has permission to edit and delete workspace, add/delete users to
-    workspace and update their role in a group. + All User/Reader Permissions
+    Admin has permission to edit and delete workspaces they are members of,
+    add/delete users to workspace and update their role in a group.
+    + All User/Reader Permissions
 
     User has permission to add tasks to the workspaces they are members of,
     edit tasks they created. + All Reader permissions
@@ -52,7 +54,9 @@ class WorkspaceUserAssociation(Base):
     user_id: Mapped[UUID] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
-    user_role: Mapped[GroupRole] = mapped_column(server_default=GroupRole.user.value)
+    user_role: Mapped[GroupRole] = mapped_column(
+        server_default=GroupRole.user.value
+    )
 
     workspace: Mapped["Workspace"] = relationship(
         back_populates="users",

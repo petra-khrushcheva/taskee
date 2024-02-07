@@ -15,6 +15,7 @@ class Settings(BaseSettings):
 
     project_name: str
     version: str
+    jwt_lifetime_seconds: int
 
     model_config = SettingsConfigDict(
         env_file=f"{os.path.dirname(os.path.abspath(__file__))}/../../.env"
