@@ -1,8 +1,8 @@
 """make workspace description optonal
 
-Revision ID: 018d079bb501
+Revision ID: d4830b3054f4
 Revises: a2efb925de75
-Create Date: 2024-02-07 12:28:20.841062
+Create Date: 2024-02-07 12:39:08.590023
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "018d079bb501"
+revision: str = "d4830b3054f4"
 down_revision: Union[str, None] = "a2efb925de75"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

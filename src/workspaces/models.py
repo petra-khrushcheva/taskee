@@ -1,5 +1,4 @@
 import enum
-from typing import Optional
 from uuid import UUID
 
 from sqlalchemy import ForeignKey, String, Text, UniqueConstraint
@@ -12,12 +11,18 @@ class Workspace(Base):
     __tablename__ = "workspaces"
 
     name: Mapped[str] = mapped_column(String(50))
-    description: Mapped[Optional[str]] = mapped_column(Text)
+    description: Mapped[str | None] = mapped_column(Text)
 
     users: Mapped[list["WorkspaceUserAssociation"]] = relationship(
         back_populates="workspace"
     )
-    tasks: Mapped[list["Task"]] = relationship(back_populates="workspace")
+    tasks: Mapped[list["Task"]] = relationship(
+        back_populates="workspace",
+        primaryjoin=(
+            "and_(Workspace.id==Task.workspace_id, Task.is_active==True)"
+        ),
+        order_by="Task.created_at.desc()"
+    )
 
 
 class GroupRole(enum.Enum):

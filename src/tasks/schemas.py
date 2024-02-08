@@ -17,7 +17,7 @@ class TaskBase(BaseModel):
 
 
 class TaskCreate(TaskBase):
-    creator_id: UUID
+    creator_id: UUID  # а нафига его передавать, если он автоматически добавится из get current user?
     executor_id: UUID | None = None
 
 
