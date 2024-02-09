@@ -100,19 +100,24 @@ class WSMembershipCRUD():
     async def add_member_to_ws(
         session: AsyncSession, ws_data: WorkspaceCreate, added_user: User
     ):
-    #     workspace = Workspace(**ws_data.model_dump())
-    #     workspace_role = WorkspaceUserAssociation(
-    #         user=current_user, ws_role=GroupRole.admin.value
-    #     )
-    #     workspace.users.append(workspace_role)
-    #     session.add(workspace)
-    #     await session.commit()
-    #     await session.refresh(workspace)
-    #     return workspace
+
+        #     workspace = Workspace(**ws_data.model_dump())
+        #     workspace_role = WorkspaceUserAssociation(
+        #         user=current_user, ws_role=GroupRole.admin.value
+        #     )
+        #     workspace.users.append(workspace_role)
+        #     session.add(workspace)
+        #     await session.commit()
+        #     await session.refresh(workspace)
+        #     return workspace
         pass
+# add member to ws
+# доступность - админ группы
+# добавленный пользователь получает статус юзера, если не указано другое
+# схема - список членов группы со статусами
 
     @staticmethod
-    async def get_workspace(
+    async def get_ws_member(
         session: AsyncSession, id: UUID, current_user: User
     ):
         return await session.get(Workspace, id)
@@ -122,23 +127,12 @@ class WSMembershipCRUD():
     # зависимость берет айди текущего юзера, айди воркспейса и проверяет,
     # есть ли мэтч в ассоциативной таблице, если нет - возвращает ошибку,
     # такую зависимость можно добавить в зависимости декоратора, а не пути
+# get member получить одного
+# доступность - любой член группы
+# Схема - один член группы, со всеми его задачами _этой_ группы
 
     @staticmethod
-    async def get_workspace_with_tasks(
-        session: AsyncSession, id: UUID, current_user: User
-    ):
-        stmt = (
-            select(Workspace)
-            .options(selectinload(Workspace.tasks))
-            .filter_by(id=id, is_active=True)
-        )
-        return await session.execute(stmt)
-
-# нужно ли здесь скалярс или олл???
-# здесь нужно разрешение для членов группы
-
-    @staticmethod
-    async def get_workspaces(session: AsyncSession, current_user: User):
+    async def get_all_ws_members(session: AsyncSession, current_user: User):
 # получить все воркспейсы с фильтрацией по айди керрент юзера,
 # к каждому воркспейсу добавить четыре задачи из него
         stmt = select(Workspace)
@@ -148,6 +142,10 @@ class WSMembershipCRUD():
 # get workspaces
 # доступность - фильтрация в ассоциативной таблице по айди юзера, отдельных разрешений не нужно
 # Схема - Все группы + по 4 задачи в каждой группе
+    
+    # get members
+# доступность - любой член группы
+# Схема - Список Юзеров со статусами
 
 
     @staticmethod

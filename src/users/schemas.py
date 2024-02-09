@@ -24,3 +24,7 @@ class UserRead(BaseModel):
 
     id: UUID
     full_name: str
+
+
+class UserWithTasks(UserRead):
+    pass

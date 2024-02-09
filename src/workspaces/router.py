@@ -10,9 +10,9 @@ from workspaces.schemas import (
 from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 from workspaces.dependencies import (
     is_ws_member, get_workspace_by_id, is_ws_admin)
-from users.dependencies import current_active_user as get_user
+from users.dependencies import get_user_by_id, current_active_user as get_user
 from users.schemas import (
-    UserRead,
+    UserRead, UserWithTasks
 )  # будут ли работать ручки, если они получают схему, а не модель?
 # и эта ли схема здесь нужна???
 
@@ -117,37 +117,53 @@ async def update_workspace(
 async def add_member_to_ws(
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session),
-    added_user: UserRead = Depends(get_user_by_id) # написать эту зависимость
+    added_user: UserRead = Depends(get_user_by_id)  # написать эту зависимость
 ):
+    """
+    Route for adding user to workspace.
+    Avaliable for any admin of that workspace.
+    """
     return await WSMembershipCRUD.add_member_to_ws(
         session=session,
-        task_data=task_data)
+        workspace=workspace,
+        added_user=added_user
+    )
 
 
-# add member to ws
-# доступность - админ группы
-# добавленный пользователь получает статус юзера, если не указано другое
-# схема - список членов группы со статусами
+@membership_router.get(
+        "/{user_id}",
+        response_model=UserWithTasks,
+        dependencies=[Depends(is_ws_member)]
+    )
+async def get_ws_member(
+    workspace: WorkspaceRead = Depends(get_workspace_by_id),
+    session: AsyncSession = Depends(get_session),
+    user: UserRead = Depends(get_user_by_id)
+):
+    """
+    Route for retrieving any workspace member with all their tasks.
+    Avaliable for any member of that workspace.
+    """
+    return WSMembershipCRUD.get_ws_member(
+        session=session,
+        workspace=workspace,
+        user=user
+    )
 
 
-@membership_router.get("/{id}", response_model=schemas.Task)
-async def get_task(task: Task = Depends(get_task_by_id)):
-    return task
-
-
-# get member получить одного
-# доступность - любой член группы
-# Схема - один член группы, со всеми его задачами _этой_ группы
-
-
-@membership_router.get("/", response_model=List[schemas.Task])
-async def get_tasks(session: AsyncSession = Depends(get_session)):
-    return await WSMembershipCRUD.get_tasks(session=session)
-
-
-# get members
-# доступность - любой член группы
-# Схема - Список Юзеров со статусами
+@membership_router.get(
+        "/",
+        response_model=List[UserRead],
+        dependencies=[Depends(is_ws_member)]
+    )
+async def get_all_ws_members(
+    session: AsyncSession = Depends(get_session),
+    workspace: WorkspaceRead = Depends(get_workspace_by_id)
+):
+    return await WSMembershipCRUD.get_all_ws_members(
+        session=session,
+        workspace=workspace
+    )
 
 
 @membership_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
