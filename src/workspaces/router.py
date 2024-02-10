@@ -128,7 +128,7 @@ async def add_member_to_ws(
         workspace=workspace,
         added_user=added_user
     )
-
+# здесь ошибка в логике. Где именно я передаю id добавляемого пользователя?
 
 @membership_router.get(
         "/{user_id}",
