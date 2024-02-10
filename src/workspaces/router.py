@@ -23,7 +23,7 @@ ws_router = APIRouter(prefix="/workspaces", tags=["Workspaces"])
 """Router for working with associations of users and workspaces"""
 membership_router = APIRouter(
     prefix="/workspaces/{ws_id}/members", tags=["Workspace Membership"]
-)     # или просто id????
+)
 
 
 @ws_router.post(
@@ -141,7 +141,8 @@ async def get_ws_member(
     user: UserRead = Depends(get_user_by_id)
 ):
     """
-    Route for retrieving any workspace member with all their tasks.
+    Route for retrieving any workspace member
+    with all their tasks of that workspace.
     Avaliable for any member of that workspace.
     """
     return WSMembershipCRUD.get_ws_member(
@@ -160,27 +161,39 @@ async def get_all_ws_members(
     session: AsyncSession = Depends(get_session),
     workspace: WorkspaceRead = Depends(get_workspace_by_id)
 ):
+    """
+    Route for retrieving all workspace members
+    with their workspace statuses.
+    Avaliable for any member of that workspace.
+    """
     return await WSMembershipCRUD.get_all_ws_members(
         session=session,
         workspace=workspace
     )
 
 
-@membership_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_task(
-    task: Task = Depends(get_task_by_id), session: AsyncSession = Depends(get_session)
+@membership_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_member_from_ws(
+    user: UserRead = Depends(get_user_by_id),
+    workspace: WorkspaceRead = Depends(get_workspace_by_id),
+    session: AsyncSession = Depends(get_session)
 ):
-    return await WSMembershipCRUD.delete_task(session=session, task=task)
-
-
-# delete member
-# доступность - is_ws_admin or self
-# Схема - без схемы, просто статус код
-# возможно редирект на страницу со всеми воркспейсами
+    """
+    Route for deleting user from workspace.
+    Avaliable for admin of that workspace or user themself.
+    """
+    return await WSMembershipCRUD.delete_member_from_ws(
+        session=session,
+        user=user,
+        workspace=workspace
+    )
 
 
 @membership_router.put(
-    "/{id}", status_code=status.HTTP_200_OK, response_model=schemas.Task
+    "/{user_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=List[UserRead],
+    dependencies=[Depends(is_ws_admin)]
 )
 async def update_task(
     task_data: schemas.TaskCreate,

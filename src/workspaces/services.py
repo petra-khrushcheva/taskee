@@ -149,8 +149,8 @@ class WSMembershipCRUD():
 
 
     @staticmethod
-    async def delete_workspace(
-        session: AsyncSession, workspace: Workspace, current_user: User
+    async def delete_member_from_ws(
+        session: AsyncSession, workspace: Workspace, user: User
     ):
         await session.delete(task)
         await session.commit()
@@ -159,6 +159,7 @@ class WSMembershipCRUD():
 # delete workspace
 # доступность - is_ws_admin
 # Схема - без схемы, просто статус код
+# добавить запрет на удаление единственного админа
 
 
 
