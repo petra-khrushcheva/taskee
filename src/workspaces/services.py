@@ -3,11 +3,15 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, contains_eager
 
 from users.models import User
 from workspaces.models import GroupRole, Workspace, WorkspaceUserAssociation
 from workspaces.schemas import WorkspaceCreate
+from tasks.models import Task
+
+
+TASKS_PER_WS_FRONT_PAGE_LIMIT = 4
 
 
 class WorkspaceCRUD():
@@ -28,19 +32,15 @@ class WorkspaceCRUD():
 
     @staticmethod
     async def get_workspace(
-        session: AsyncSession, id: UUID, current_user: User
+        session: AsyncSession, id: UUID
     ):
         return await session.get(Workspace, id)
-    # здесь нужно разрешение для членов группы, но разрешение 
-    # определяется зависимостью в пути, а здесь только работа с базой данных
-
-    # зависимость берет айди текущего юзера, айди воркспейса и проверяет,
-    # есть ли мэтч в ассоциативной таблице, если нет - возвращает ошибку,
-    # такую зависимость можно добавить в зависимости декоратора, а не пути
 
     @staticmethod
     async def get_workspace_with_tasks(
-        session: AsyncSession, id: UUID, current_user: User
+        session: AsyncSession,
+        id: UUID,
+        # current_user: User
     ):
         stmt = (
             select(Workspace)
@@ -48,49 +48,55 @@ class WorkspaceCRUD():
             .filter_by(id=id, is_active=True)
         )
         return await session.execute(stmt)
-
+# после можно добавить функционал, показывающий,
+# является ли каррент юзер исполнителем или создателем задачи.
 # нужно ли здесь скалярс или олл???
-# здесь нужно разрешение для членов группы
 
     @staticmethod
     async def get_workspaces(session: AsyncSession, current_user: User):
+        subq = (
+            select(Task.id.label("task_id"))
+            .filter(Task.workspace_id == Workspace.id)
+            .order_by(Task.created_at.desc())
+            .limit(TASKS_PER_WS_FRONT_PAGE_LIMIT)
+            .scalar_subquery()  # я хз будет ли работать эта хуйня, может здесь просто сабкваери???
+            .correlate(Workspace)
+            )
+        stmt = (
+            select(Workspace)
+            .join(WorkspaceUserAssociation)
+            .join(Task, Task.id.in_(subq))
+            .where(WorkspaceUserAssociation.user_id == current_user.id)
+            .options(contains_eager(Workspace.tasks))
+        )
+        result: Result = await session.execute(stmt)
+        workspaces = result.unique().scalars().all()
+        return workspaces
 # получить все воркспейсы с фильтрацией по айди керрент юзера,
 # к каждому воркспейсу добавить четыре задачи из него
-        stmt = select(Workspace)
-        result: Result = await session.execute(stmt)
-        tasks = result.scalars().all()
-        return tasks
-# get workspaces
-# доступность - фильтрация в ассоциативной таблице по айди юзера, отдельных разрешений не нужно
 # Схема - Все группы + по 4 задачи в каждой группе
-
+# после можно добавить функционал, показывающий,
+# кто является сполнителем задачи.
 
     @staticmethod
     async def delete_workspace(
-        session: AsyncSession, workspace: Workspace, current_user: User
+        session: AsyncSession, workspace: Workspace
     ):
-        await session.delete(task)
+        await session.delete(workspace)
         await session.commit()
-# здесь нужно закомментить строку с удалением воркспейса и создать изменение параметра из_актив
-# также здесь нужно разрешение только для админов 
-# delete workspace
-# доступность - is_ws_admin
-# Схема - без схемы, просто статус код
-
-
+# здесь нужно закомментить строку с удалением воркспейса
+# и создать изменение параметра из_актив
 
     @staticmethod
-    async def update_workspace(session: AsyncSession,
-                          workspace: Task,
-                          workspace_data: TaskCreate,
-                          current_user: User):
-        for key, value in task_data.model_dump().items():
-            setattr(task, key, value)
+    async def update_workspace(
+        session: AsyncSession,
+        workspace: Workspace,
+        workspace_data: WorkspaceCreate
+    ):
+        for key, value in workspace_data.model_dump().items():
+            setattr(workspace, key, value)
         await session.commit()
-        return task
-# здесь нужно разрешение только для админов 
-# update workspace
-# доступность - is_ws_admin
+        return workspace
 # Схема - ws_read (без списка задач)
 
 
@@ -112,7 +118,6 @@ class WSMembershipCRUD():
         #     return workspace
         pass
 # add member to ws
-# доступность - админ группы
 # добавленный пользователь получает статус юзера, если не указано другое
 # схема - список членов группы со статусами
 
@@ -133,20 +138,14 @@ class WSMembershipCRUD():
 
     @staticmethod
     async def get_all_ws_members(session: AsyncSession, current_user: User):
-# получить все воркспейсы с фильтрацией по айди керрент юзера,
-# к каждому воркспейсу добавить четыре задачи из него
         stmt = select(Workspace)
         result: Result = await session.execute(stmt)
         tasks = result.scalars().all()
         return tasks
-# get workspaces
-# доступность - фильтрация в ассоциативной таблице по айди юзера, отдельных разрешений не нужно
-# Схема - Все группы + по 4 задачи в каждой группе
-    
-    # get members
+
+# get members
 # доступность - любой член группы
 # Схема - Список Юзеров со статусами
-
 
     @staticmethod
     async def delete_member_from_ws(
@@ -154,11 +153,6 @@ class WSMembershipCRUD():
     ):
         await session.delete(task)
         await session.commit()
-# здесь нужно закомментить строку с удалением воркспейса и создать изменение параметра из_актив
-# также здесь нужно разрешение только для админов 
-# delete workspace
-# доступность - is_ws_admin
-# Схема - без схемы, просто статус код
 # добавить запрет на удаление единственного админа
 
     @staticmethod
@@ -170,12 +164,6 @@ class WSMembershipCRUD():
             setattr(task, key, value)
         await session.commit()
         return task
-# здесь нужно разрешение только для админов 
-# update workspace
-# доступность - is_ws_admin
-# Схема - ws_read (без списка задач)
-
 
 # update member role
-# доступность - is_ws_admin
 # Схема - список юзеров со статусами

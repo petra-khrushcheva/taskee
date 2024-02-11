@@ -60,6 +60,7 @@ class WorkspaceUserAssociation(Base):
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     user_role: Mapped[GroupRole] = mapped_column(
+        default=GroupRole.user.value,
         server_default=GroupRole.user.value
     )
 

@@ -1,6 +1,7 @@
 from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from core.basemodels import Base
 
@@ -22,6 +23,6 @@ class User(Base, SQLAlchemyBaseUserTableUUID):
         back_populates="user"
     )
 
-    @property
+    @hybrid_property
     def full_name(self):
         return f"{self.first_name} {self.last_name}"

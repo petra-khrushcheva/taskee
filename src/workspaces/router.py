@@ -34,24 +34,32 @@ async def create_workspace(
     session: AsyncSession = Depends(get_session),
     current_user: UserRead = Depends(get_user),
 ):
-    """Route for creating a workspace. Avaliable for any authenticated user"""
+    """
+    Route for creating a workspace.
+    Avaliable for any authenticated user.
+    Current user becomes an admin of created workspace.
+    """
     return await WorkspaceCRUD.create_workspace(
         session=session, ws_data=ws_data, current_user=current_user
     )
 
 
-@ws_router.get("/{id}", response_model=WorkspaceWithTasks)
+@ws_router.get(
+        "/{id}",
+        response_model=WorkspaceWithTasks,
+        dependencies=[Depends(is_ws_member)]
+    )
 async def get_workspace(
     id: UUID,
     session: AsyncSession = Depends(get_session),
-    current_user: UserRead = Depends(is_ws_member),
+    # current_user: UserRead = Depends(is_ws_member),
 ):
     """
     Route for retrieving a workspace with all its tasks.
     Avaliable for any member of that workspace
     """
     workspace = WorkspaceCRUD.get_workspace_with_tasks(
-        id=id, current_user=current_user, session=session
+        session=session, id=id,  # current_user=current_user
     )
     return workspace
 
@@ -72,18 +80,21 @@ async def get_workspaces(
     )
 
 
-@ws_router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+@ws_router.delete(
+        "/{id}",
+        status_code=status.HTTP_204_NO_CONTENT,
+        dependencies=[Depends(is_ws_admin)]
+    )
 async def delete_workspace(
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    session: AsyncSession = Depends(get_session),
-    current_user: UserRead = Depends(is_ws_admin)
+    session: AsyncSession = Depends(get_session)
 ):
     """
     Route for deleting a workspace.
     Avaliable for any workspace admin.
     """
     return await WorkspaceCRUD.delete_workspace(
-        session=session, workspace=workspace, current_user=current_user
+        session=session, workspace=workspace
     )
 
 
