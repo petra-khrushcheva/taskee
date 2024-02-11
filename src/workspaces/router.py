@@ -5,16 +5,16 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_session
 from workspaces.schemas import (
-    WorkspaceRead, WorkspaceCreate, WorkspaceWithTasks
+    WorkspaceRead, WorkspaceCreate, WorkspaceWithTasks, MembershipCreate
 )
 from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 from workspaces.dependencies import (
-    is_ws_member, get_workspace_by_id, is_ws_admin)
+    is_ws_member, get_workspace_by_id, is_ws_admin
+)
 from users.dependencies import get_user_by_id, current_active_user as get_user
 from users.schemas import (
     UserRead, UserWithTasks
-)  # будут ли работать ручки, если они получают схему, а не модель?
-# и эта ли схема здесь нужна???
+)   # какая юзер схема здесь на самом деле нужна???
 
 
 """Router for workspace CRUD"""
@@ -117,7 +117,7 @@ async def update_workspace(
 async def add_member_to_ws(
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session),
-    added_user: UserRead = Depends(get_user_by_id)  # написать эту зависимость
+    added_user: MembershipCreate = Depends(get_user_by_id)
 ):
     """
     Route for adding user to workspace.
@@ -129,6 +129,7 @@ async def add_member_to_ws(
         added_user=added_user
     )
 # здесь ошибка в логике. Где именно я передаю id добавляемого пользователя?
+
 
 @membership_router.get(
         "/{user_id}",
@@ -172,6 +173,7 @@ async def get_all_ws_members(
     )
 
 
+# удалить можно только юзера который уже член вс
 @membership_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_member_from_ws(
     user: UserRead = Depends(get_user_by_id),
@@ -189,20 +191,24 @@ async def delete_member_from_ws(
     )
 
 
+# менять можно только статус юзера, который уже член воркспейса
 @membership_router.put(
     "/{user_id}",
     status_code=status.HTTP_200_OK,
     response_model=List[UserRead],
     dependencies=[Depends(is_ws_admin)]
 )
-async def update_task(
-    task_data: schemas.TaskCreate,
-    task: Task = Depends(get_task_by_id),
+async def update_ws_user_role(
+    updated_ws_user: MembershipCreate = Depends(get_user_by_id),
+    workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session),
 ):
-    return await WSMembershipCRUD.update_task(session=session, task=task, task_data=task_data)
-
-
-# update member role
-# доступность - is_ws_admin
-# Схема - список юзеров со статусами
+    """
+    Route for updating user status in the workspace.
+    Avaliable for any admin of that workspace.
+    """
+    return await WSMembershipCRUD.update_ws_user_role(
+        session=session,
+        workspace=workspace,
+        updated_ws_user=updated_ws_user
+    )

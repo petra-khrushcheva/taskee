@@ -1,13 +1,13 @@
 from uuid import UUID
+
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from workspaces.models import Workspace, WorkspaceUserAssociation, GroupRole
-from workspaces.schemas import WorkspaceCreate
-
 from users.models import User
+from workspaces.models import GroupRole, Workspace, WorkspaceUserAssociation
+from workspaces.schemas import WorkspaceCreate
 
 
 class WorkspaceCRUD():
@@ -161,10 +161,8 @@ class WSMembershipCRUD():
 # Схема - без схемы, просто статус код
 # добавить запрет на удаление единственного админа
 
-
-
     @staticmethod
-    async def update_workspace(session: AsyncSession,
+    async def update_ws_user_role(session: AsyncSession,
                           workspace: Task,
                           workspace_data: TaskCreate,
                           current_user: User):
@@ -178,3 +176,6 @@ class WSMembershipCRUD():
 # Схема - ws_read (без списка задач)
 
 
+# update member role
+# доступность - is_ws_admin
+# Схема - список юзеров со статусами

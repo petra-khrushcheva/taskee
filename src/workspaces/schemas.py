@@ -1,6 +1,6 @@
 from uuid import UUID
-from pydantic import BaseModel, ConfigDict
 
+from pydantic import BaseModel, ConfigDict
 
 # TYPE_CHEKING ????
 
@@ -21,4 +21,8 @@ class WorkspaceRead(WorkspaceBase):
 
 class WorkspaceWithTasks(WorkspaceRead):
     # tasks: list[Task] ????
+    pass
+
+
+class MembershipCreate(BaseModel):
     pass

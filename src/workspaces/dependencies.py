@@ -5,8 +5,8 @@ from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_session
-from workspaces.services import WorkspaceCRUD
 from users.dependencies import current_active_user as get_user
+from workspaces.services import WorkspaceCRUD
 
 
 async def get_workspace_by_id(
@@ -35,3 +35,8 @@ async def is_ws_member():
 
 async def is_ws_admin():
     pass
+
+
+
+
+# возможно зависимость is_ws_member() нужно строить от просто юзера, а не от current user-a, потому что тогда ее можно будет использовать в updayr и delete membership
