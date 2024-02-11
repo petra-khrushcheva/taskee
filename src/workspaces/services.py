@@ -82,10 +82,9 @@ class WorkspaceCRUD():
     async def delete_workspace(
         session: AsyncSession, workspace: Workspace
     ):
-        await session.delete(workspace)
+        # await session.delete(workspace)
+        workspace.is_active = False
         await session.commit()
-# здесь нужно закомментить строку с удалением воркспейса
-# и создать изменение параметра из_актив
 
     @staticmethod
     async def update_workspace(
