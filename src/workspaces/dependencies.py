@@ -5,15 +5,18 @@ from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_session
-from users.dependencies import current_active_user as get_user
+# from users.dependencies import current_active_user as get_user
 from workspaces.services import WorkspaceCRUD
 
 
+# id во всех ручках надо прописать как ws_id, чтобы можно было везде
+# использовать одну и ту же зависимость
+# и здесь тоже
 async def get_workspace_by_id(
-        id: Annotated[UUID, Path],
+        ws_id: Annotated[UUID, Path],
         session: AsyncSession = Depends(get_session)
 ):
-    workspace = await WorkspaceCRUD.get_workspace(session=session, id=id)
+    workspace = await WorkspaceCRUD.get_workspace(session=session, ws_id=ws_id)
     if workspace is not None:
         return workspace
     raise HTTPException(
@@ -41,6 +44,12 @@ async def is_ws_admin():
     pass
 
 
-
-
 # возможно зависимость is_ws_member() нужно строить от просто юзера, а не от current user-a, потому что тогда ее можно будет использовать в updayr и delete membership
+
+
+async def has_ws_member_permissions():
+    pass
+
+
+async def has_ws_admin_permissions():
+    pass

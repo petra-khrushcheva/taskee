@@ -45,12 +45,12 @@ async def create_workspace(
 
 
 @ws_router.get(
-        "/{id}",
+        "/{ws_id}",
         response_model=WorkspaceWithTasks,
         dependencies=[Depends(is_ws_member)]
     )
 async def get_workspace(
-    id: UUID,
+    ws_id: UUID,
     session: AsyncSession = Depends(get_session),
     # current_user: UserRead = Depends(is_ws_member),
 ):
@@ -59,7 +59,7 @@ async def get_workspace(
     Avaliable for any member of that workspace
     """
     workspace = WorkspaceCRUD.get_workspace_with_tasks(
-        session=session, id=id,  # current_user=current_user
+        session=session, ws_id=ws_id,  # current_user=current_user
     )
     return workspace
 
@@ -81,7 +81,7 @@ async def get_workspaces(
 
 
 @ws_router.delete(
-        "/{id}",
+        "/{ws_id}",
         status_code=status.HTTP_204_NO_CONTENT,
         dependencies=[Depends(is_ws_admin)]
     )
@@ -99,7 +99,9 @@ async def delete_workspace(
 
 
 @ws_router.put(
-        "/{id}", status_code=status.HTTP_200_OK, response_model=WorkspaceRead
+        "/{ws_id}",
+        status_code=status.HTTP_200_OK,
+        response_model=WorkspaceRead
     )
 async def update_workspace(
     ws_data: WorkspaceCreate,
@@ -126,20 +128,22 @@ async def update_workspace(
     dependencies=[Depends(is_ws_admin)]
 )
 async def add_member_to_ws(
+    membership: MembershipCreate,
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    session: AsyncSession = Depends(get_session),
-    added_user: MembershipCreate = Depends(get_user_by_id)
+    session: AsyncSession = Depends(get_session)
 ):
     """
     Route for adding user to workspace.
     Avaliable for any admin of that workspace.
     """
-    return await WSMembershipCRUD.add_member_to_ws(
+    await WSMembershipCRUD.add_member_to_ws(
         session=session,
         workspace=workspace,
-        added_user=added_user
+        membership=membership
     )
+    return await WSMembershipCRUD.get_all_ws_members(session=session)
 # здесь ошибка в логике. Где именно я передаю id добавляемого пользователя?
+# ты передаешь его в мембершип криэйт, дорогая, не тупи)
 
 
 @membership_router.get(
@@ -149,8 +153,8 @@ async def add_member_to_ws(
     )
 async def get_ws_member(
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    session: AsyncSession = Depends(get_session),
-    user: UserRead = Depends(get_user_by_id)
+    user: UserRead = Depends(get_user_by_id),
+    session: AsyncSession = Depends(get_session)
 ):
     """
     Route for retrieving any workspace member
@@ -170,8 +174,8 @@ async def get_ws_member(
         dependencies=[Depends(is_ws_member)]
     )
 async def get_all_ws_members(
-    session: AsyncSession = Depends(get_session),
-    workspace: WorkspaceRead = Depends(get_workspace_by_id)
+    ws_id: UUID,
+    session: AsyncSession = Depends(get_session)
 ):
     """
     Route for retrieving all workspace members
@@ -179,13 +183,16 @@ async def get_all_ws_members(
     Avaliable for any member of that workspace.
     """
     return await WSMembershipCRUD.get_all_ws_members(
-        session=session,
-        workspace=workspace
+        session=session, ws_id=ws_id
     )
 
 
 # удалить можно только юзера который уже член вс
-@membership_router.delete("/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@membership_router.delete(
+        "/{user_id}",
+        status_code=status.HTTP_204_NO_CONTENT,
+        response_model=List[UserRead]
+    )
 async def delete_member_from_ws(
     user: UserRead = Depends(get_user_by_id),
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
@@ -195,11 +202,12 @@ async def delete_member_from_ws(
     Route for deleting user from workspace.
     Avaliable for admin of that workspace or user themself.
     """
-    return await WSMembershipCRUD.delete_member_from_ws(
+    await WSMembershipCRUD.delete_member_from_ws(
         session=session,
         user=user,
         workspace=workspace
     )
+    return await WSMembershipCRUD.get_all_ws_members(session=session)
 
 
 # менять можно только статус юзера, который уже член воркспейса
@@ -210,7 +218,7 @@ async def delete_member_from_ws(
     dependencies=[Depends(is_ws_admin)]
 )
 async def update_ws_user_role(
-    updated_ws_user: MembershipCreate = Depends(get_user_by_id),
+    updated_ws_user: MembershipCreate,
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session),
 ):

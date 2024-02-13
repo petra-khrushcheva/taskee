@@ -7,7 +7,7 @@ from sqlalchemy.orm import selectinload, contains_eager
 
 from users.models import User
 from workspaces.models import GroupRole, Workspace, WorkspaceUserAssociation
-from workspaces.schemas import WorkspaceCreate
+from workspaces.schemas import WorkspaceCreate, MembershipCreate
 from tasks.models import Task
 
 
@@ -31,21 +31,19 @@ class WorkspaceCRUD():
         return workspace
 
     @staticmethod
-    async def get_workspace(
-        session: AsyncSession, id: UUID
-    ):
-        return await session.get(Workspace, id)
+    async def get_workspace(session: AsyncSession, ws_id: UUID):
+        return await session.get(Workspace, ws_id)
 
     @staticmethod
     async def get_workspace_with_tasks(
         session: AsyncSession,
-        id: UUID,
+        ws_id: UUID,
         # current_user: User
     ):
         stmt = (
             select(Workspace)
             .options(selectinload(Workspace.tasks))
-            .filter_by(id=id, is_active=True)
+            .filter_by(id=ws_id)
         )
         return await session.execute(stmt)
 # после можно добавить функционал, показывающий,
@@ -76,14 +74,14 @@ class WorkspaceCRUD():
 # к каждому воркспейсу добавить четыре задачи из него
 # Схема - Все группы + по 4 задачи в каждой группе
 # после можно добавить функционал, показывающий,
-# кто является сполнителем задачи.
+# кто является исполнителем задачи.
 
     @staticmethod
     async def delete_workspace(
         session: AsyncSession, workspace: Workspace
     ):
-        # await session.delete(workspace)
-        workspace.is_active = False
+        await session.delete(workspace)
+        # workspace.is_active = False
         await session.commit()
 
     @staticmethod
@@ -103,40 +101,31 @@ class WSMembershipCRUD():
 
     @staticmethod
     async def add_member_to_ws(
-        session: AsyncSession, ws_data: WorkspaceCreate, added_user: User
+        session: AsyncSession,
+        workspace: Workspace,
+        membership: MembershipCreate
     ):
+        ws_membership = WorkspaceUserAssociation(**membership.model_dump())
+        workspace.users.append(ws_membership)
+        await session.commit()
 
-        #     workspace = Workspace(**ws_data.model_dump())
-        #     workspace_role = WorkspaceUserAssociation(
-        #         user=current_user, ws_role=GroupRole.admin.value
-        #     )
-        #     workspace.users.append(workspace_role)
-        #     session.add(workspace)
-        #     await session.commit()
-        #     await session.refresh(workspace)
-        #     return workspace
-        pass
 # add member to ws
 # добавленный пользователь получает статус юзера, если не указано другое
-# схема - список членов группы со статусами
+# схема - список членов группы со статусами, по идее в ручке можно
+# использовать эту функцию и get_all_ws_members вместе
 
     @staticmethod
     async def get_ws_member(
         session: AsyncSession, id: UUID, current_user: User
     ):
         return await session.get(Workspace, id)
-    # здесь нужно разрешение для членов группы, но разрешение 
-    # определяется зависимостью в пути, а здесь только работа с базой данных
 
-    # зависимость берет айди текущего юзера, айди воркспейса и проверяет,
-    # есть ли мэтч в ассоциативной таблице, если нет - возвращает ошибку,
-    # такую зависимость можно добавить в зависимости декоратора, а не пути
 # get member получить одного
 # доступность - любой член группы
 # Схема - один член группы, со всеми его задачами _этой_ группы
 
     @staticmethod
-    async def get_all_ws_members(session: AsyncSession, current_user: User):
+    async def get_all_ws_members(session: AsyncSession, ws_id: UUID):
         stmt = select(Workspace)
         result: Result = await session.execute(stmt)
         tasks = result.scalars().all()
@@ -155,10 +144,12 @@ class WSMembershipCRUD():
 # добавить запрет на удаление единственного админа
 
     @staticmethod
-    async def update_ws_user_role(session: AsyncSession,
-                          workspace: Task,
-                          workspace_data: TaskCreate,
-                          current_user: User):
+    async def update_ws_user_role(
+        session: AsyncSession,
+        workspace: Workspace,
+        membership: MembershipCreate,
+        current_user: User
+    ):
         for key, value in task_data.model_dump().items():
             setattr(task, key, value)
         await session.commit()
