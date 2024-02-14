@@ -9,6 +9,20 @@ from core.database import get_session
 from workspaces.services import WorkspaceCRUD
 
 
+async def is_part_of_workspace(
+        user_id: UUID,
+        ws_id: UUID,
+        session: AsyncSession = Depends(get_session)
+    ):
+    # здесь будет функция из круда, находящая в базе данных пользователя принадлежащего к группе
+    # а здесь будет прописана ошибка, если он - None
+
+
+
+
+
+
+
 # id во всех ручках надо прописать как ws_id, чтобы можно было везде
 # использовать одну и ту же зависимость
 # и здесь тоже
@@ -45,11 +59,3 @@ async def is_ws_admin():
 
 
 # возможно зависимость is_ws_member() нужно строить от просто юзера, а не от current user-a, потому что тогда ее можно будет использовать в updayr и delete membership
-
-
-async def has_ws_member_permissions():
-    pass
-
-
-async def has_ws_admin_permissions():
-    pass

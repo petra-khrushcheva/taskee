@@ -10,7 +10,7 @@ from tasks.models import Task
 from tasks.services import TaskCRUD
 
 router = APIRouter(
-    prefix='/tasks',
+    prefix='/workspaces/{ws_id}/tasks',
     tags=['Tasks']
 )
 
