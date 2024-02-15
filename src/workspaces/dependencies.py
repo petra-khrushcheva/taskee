@@ -5,27 +5,85 @@ from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_session
-# from users.dependencies import current_active_user as get_user
-from workspaces.services import WorkspaceCRUD
+from users.dependencies import current_active_user as current_user
+from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
+
+from users.models import User
+from workspaces.models import GroupRole
 
 
 async def is_user_in_workspace(
         user_id: UUID,
         ws_id: UUID,
         session: AsyncSession = Depends(get_session)
-    ):
-    # здесь будет функция из круда, находящая в базе данных пользователя принадлежащего к группе
-    # а здесь будет прописана ошибка, если он - None
+):
+    """
+    Checks if user is associated with workspace in any role.
+    """
+    user = await WSMembershipCRUD.get_ws_user_and_role(
+        session=session, ws_id=ws_id, user_id=user_id
+    )
+    if user is not None:
+        return user
+    raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"There is no user {user_id} in workspace {ws_id}"
+        )
 
 
+async def is_ws_member(
+        ws_id: Annotated[UUID, Path],
+        user: User = Depends(current_user),
+        session: AsyncSession = Depends(get_session),
+):
+    """
+    Checks if current user is associated with workspace in any role.
+    """
+    user = await is_user_in_workspace(
+        session=session, ws_id=ws_id, user_id=user.id
+    )
+    return user
 
 
+async def is_ws_admin(
+        ws_id: UUID,
+        user: User = Depends(is_ws_member),
+        session: AsyncSession = Depends(get_session)
+):
+    """
+    Checks if current user has admin rights.
+    """
+    user_role = await WSMembershipCRUD.get_user_role_in_ws(
+        session=session, ws_id=ws_id, user=user
+    )
+    if user_role == GroupRole.admin.value:
+        return user
+    raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorised to perform this action"
+        )
 
 
+async def is_ws_user(
+        ws_id: UUID,
+        user: User = Depends(is_ws_member),
+        session: AsyncSession = Depends(get_session)
+):
+    """
+    Checks if current user has workspace user rights.
+    (Are they allowed to create tasks).
+    """
+    user_role = await WSMembershipCRUD.get_user_role_in_ws(
+        session=session, ws_id=ws_id, user=user
+    )
+    if user_role != GroupRole.reader.value:
+        return user
+    raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You are not authorised to perform this action"
+        )
 
-# id во всех ручках надо прописать как ws_id, чтобы можно было везде
-# использовать одну и ту же зависимость
-# и здесь тоже
+
 async def get_workspace_by_id(
         ws_id: Annotated[UUID, Path],
         session: AsyncSession = Depends(get_session)
@@ -39,23 +97,21 @@ async def get_workspace_by_id(
         )
 
 
-async def is_ws_member():
-    pass
-# если юзер не член этого воркспейса - You ara not authorised to work in this workspace
-
-    # if task.creator != current_user.id:
-    #     raise HTTPException(
-    #         status_code=status.HTTP_403_FORBIDDEN,
-    #         detail="Not authorized to perform requested action"
-    #     )
-
-    # зависимость берет айди текущего юзера, айди воркспейса и проверяет,
-    # есть ли мэтч в ассоциативной таблице, если нет - возвращает ошибку,
-    # такую зависимость можно добавить в зависимости декоратора, а не пути
-
-
-async def is_ws_admin():
-    pass
-
-
-# возможно зависимость is_ws_member() нужно строить от просто юзера, а не от current user-a, потому что тогда ее можно будет использовать в updayr и delete membership
+async def get_ws_user_by_id(
+        user_id: Annotated[UUID, Path],
+        ws_id: Annotated[UUID, Path],
+        session: AsyncSession = Depends(get_session)
+):
+    """
+    Checks if user declared in the path
+    is associated with workspace in any role.
+    """
+    user = await WSMembershipCRUD.get_ws_user(
+        session=session, ws_id=ws_id, user_id=user_id
+    )
+    if user is not None:
+        return user
+    raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"There is no user {user_id} in workspace {ws_id}"
+        )

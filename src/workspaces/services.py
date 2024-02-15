@@ -115,10 +115,29 @@ class WSMembershipCRUD():
 # использовать эту функцию и get_all_ws_members вместе
 
     @staticmethod
-    async def get_ws_member(
-        session: AsyncSession, id: UUID, current_user: User
+    async def get_ws_user(session: AsyncSession, ws_id: UUID, user_id: UUID):
+        stmt = (
+            select(User)
+            .join(WorkspaceUserAssociation)
+            .where(
+                User.id == user_id,
+                WorkspaceUserAssociation.workspace_id == ws_id
+            )
+        )
+        user: Result = await session.execute(stmt)
+        return user.scalar_one_or_none()
+
+    @staticmethod
+    async def get_user_role_in_ws(
+        session: AsyncSession, user: User, ws_id: UUID
     ):
-        return await session.get(Workspace, id)
+        stmt = (
+            select(WorkspaceUserAssociation.user_role)
+            .filter_by(user_id=user.id, workspace_id=ws_id)
+        )
+        user_role: Result = await session.execute(stmt)
+        return user_role.scalar_one()  # ??? может и не скаляр, посмотрим на результат 
+
 
 # get member получить одного
 # доступность - любой член группы
