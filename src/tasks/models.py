@@ -7,7 +7,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from core.basemodels import Base
 
 
-class TaskStatus(enum.Enum):
+class TaskStatus(str, enum.Enum):
     new = "new"
     wip = "wip"
     completed = "completed"

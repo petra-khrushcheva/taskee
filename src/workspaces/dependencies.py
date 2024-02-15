@@ -9,7 +9,7 @@ from core.database import get_session
 from workspaces.services import WorkspaceCRUD
 
 
-async def is_part_of_workspace(
+async def is_user_in_workspace(
         user_id: UUID,
         ws_id: UUID,
         session: AsyncSession = Depends(get_session)

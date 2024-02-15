@@ -25,7 +25,7 @@ class Workspace(Base):
     )
 
 
-class GroupRole(enum.Enum):
+class GroupRole(str, enum.Enum):
     """
     Admin has permission to edit and delete workspaces they are members of,
     add/delete users to workspace and update their role in a group.
