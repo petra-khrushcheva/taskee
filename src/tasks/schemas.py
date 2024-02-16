@@ -10,7 +10,7 @@ from users.schemas import UserRead
 
 class TaskBase(BaseModel):
     title: Annotated[str, MaxLen(50)]
-    description: str
+    description: str | None = None
     status: TaskStatus = TaskStatus.new.value
 # возможно value,
 # возможно в придется убрать str из самого энума, если алхимия будет ругаться
@@ -25,5 +25,4 @@ class TaskRead(TaskBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
-    creator: UserRead
     executor: UserRead | None = None

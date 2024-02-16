@@ -44,7 +44,7 @@ class WorkspaceCRUD():
     ):
         stmt = (
             select(Workspace)
-            .options(selectinload(Workspace.tasks))
+            .options(selectinload(Workspace.tasks).selectinload(Task.executor))
             .filter_by(id=ws_id)
         )
         result = await session.execute(stmt)

@@ -6,10 +6,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_session
 from users.dependencies import current_active_user as current_user
-from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
-
 from users.models import User
 from workspaces.models import GroupRole
+from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 
 
 async def is_user_in_workspace(
