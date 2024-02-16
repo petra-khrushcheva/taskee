@@ -9,7 +9,3 @@ current_active_verified_user = fastapi_users.current_user(
 )
 
 current_superuser = fastapi_users.current_user(active=True, superuser=True)
-
-
-async def get_user_by_id():
-    pass

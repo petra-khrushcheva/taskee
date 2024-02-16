@@ -7,7 +7,9 @@ from sqlalchemy.orm import selectinload, contains_eager
 
 from users.models import User
 from workspaces.models import GroupRole, Workspace, WorkspaceUserAssociation
-from workspaces.schemas import WorkspaceCreate, MembershipCreate
+from workspaces.schemas import (
+    WorkspaceCreate, MembershipCreate, MembershipUpdate
+)
 from tasks.models import Task
 
 
@@ -45,10 +47,10 @@ class WorkspaceCRUD():
             .options(selectinload(Workspace.tasks))
             .filter_by(id=ws_id)
         )
-        return await session.execute(stmt)
+        result = await session.execute(stmt)
+        return result.scalar_one_or_none()
 # дальше можно будет добавить функционал, показывающий,
 # является ли каррент юзер исполнителем или создателем задачи.
-# нужно ли здесь скалярс или олл???
 
     @staticmethod
     async def get_workspaces(session: AsyncSession, current_user: User):
@@ -92,7 +94,7 @@ class WorkspaceCRUD():
         for key, value in workspace_data.model_dump().items():
             setattr(workspace, key, value)
         await session.commit()
-        return workspace  # refresh???
+        return workspace
 
 
 class WSMembershipCRUD():
@@ -132,43 +134,58 @@ class WSMembershipCRUD():
         return user_role.scalar_one()  # ??? может и не скаляр, посмотрим на результат 
 
     @staticmethod
-    async def get_ws_user_with_tasks():
-        pass
-
-# get member получить одного
-# доступность - любой член группы
-# Схема - один член группы, со всеми его задачами _этой_ группы
+    async def get_ws_user_with_tasks(
+        session: AsyncSession, user: User, workspace: Workspace
+    ):
+        stmt = (
+            select(User)
+            .join(Task)
+            .where(Task.workspace_id == workspace.id, User.id == user.id)
+            .options(selectinload(User.appointed_tasks))
+        )
+        user_with_tasks: Result = session.execute(stmt)
+        return user_with_tasks.scalar_one()
 
     @staticmethod
     async def get_all_ws_members(session: AsyncSession, ws_id: UUID):
-        stmt = select(Workspace)
+        stmt = (
+            select(User.id, User.full_name, WorkspaceUserAssociation.user_role)
+            .join(WorkspaceUserAssociation)
+            .where(WorkspaceUserAssociation.workspace_id == ws_id)
+        )
         result: Result = await session.execute(stmt)
-        tasks = result.scalars().all()
-        return tasks
-
-# get members
-# доступность - любой член группы
-# Схема - Список Юзеров со статусами
+        users_with_statuses = result.scalars().all()
+        return users_with_statuses
 
     @staticmethod
     async def delete_member_from_ws(
         session: AsyncSession, workspace: Workspace, user: User
     ):
-        await session.delete(task)
+        stmt = (
+            select(WorkspaceUserAssociation)
+            .where(
+                WorkspaceUserAssociation.user_id == user.id,
+                WorkspaceUserAssociation.workspace_id == workspace.id)
+            )
+        membership = await session.execute(stmt)
+        await session.delete(membership)
         await session.commit()
-# добавить запрет на удаление единственного админа
 
     @staticmethod
     async def update_ws_user_role(
         session: AsyncSession,
         workspace: Workspace,
-        membership: MembershipCreate,
-        current_user: User
+        user: User,
+        updated_user_status: MembershipUpdate
     ):
-        for key, value in task_data.model_dump().items():
-            setattr(task, key, value)
+        stmt = (
+            select(WorkspaceUserAssociation)
+            .where(
+                WorkspaceUserAssociation.user_id == user.id,
+                WorkspaceUserAssociation.workspace_id == workspace.id)
+            )
+        membership: WorkspaceUserAssociation = await (
+            session.execute(stmt).scalar_one()
+        )
+        membership.user_role = updated_user_status.user_role
         await session.commit()
-        return task
-
-# update member role
-# Схема - список юзеров со статусами

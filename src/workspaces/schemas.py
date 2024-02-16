@@ -16,6 +16,10 @@ class WorkspaceCreate(WorkspaceBase):
     pass
 
 
+class WorkspaceUpdate(WorkspaceBase):
+    name: str | None = None
+
+
 class WorkspaceRead(WorkspaceBase):
     model_config = ConfigDict(from_attributes=True)
 
@@ -26,11 +30,14 @@ class WorkspaceWithTasks(WorkspaceRead):
     tasks: list[TaskRead]
 
 
-class MembershipCreate(BaseModel):
-    user_id: UUID
+class MembershipUpdate(BaseModel):
     user_role: GroupRole = GroupRole.user
 # возможно value,
 # возможно в придется убрать str из самого энума, если алхимия будет ругаться
+
+
+class MembershipCreate(MembershipUpdate):
+    user_id: UUID
 
 
 class WorkspaceUser(UserRead):

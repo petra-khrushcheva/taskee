@@ -5,18 +5,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_session
 from workspaces.schemas import (
-    WorkspaceRead, WorkspaceCreate, WorkspaceWithTasks, MembershipCreate
+    WorkspaceRead, WorkspaceCreate, WorkspaceWithTasks, MembershipCreate,
+    WorkspaceUpdate, MembershipUpdate
 )
 from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 from workspaces.dependencies import (
-    is_ws_member, get_workspace_by_id, is_ws_admin
+    is_ws_member, get_workspace_by_id, is_ws_admin, get_ws_user_by_id,
+    is_admin_or_self
 )
-from users.dependencies import (
-    get_user_by_id, current_active_user as current_user
-)
+from users.dependencies import current_active_user as current_user
 from users.schemas import (
     UserRead, UserWithTasks
-)   # какая юзер схема здесь на самом деле нужна???
+)
 
 
 """Router for workspace CRUD"""
@@ -106,7 +106,7 @@ async def delete_workspace(
         response_model=WorkspaceRead
     )
 async def update_workspace(
-    ws_data: WorkspaceCreate,
+    ws_data: WorkspaceUpdate,
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session),
     current_user: UserRead = Depends(is_ws_admin)
@@ -143,9 +143,9 @@ async def add_member_to_ws(
         workspace=workspace,
         membership=membership
     )
-    return await WSMembershipCRUD.get_all_ws_members(session=session)
-# здесь ошибка в логике. Где именно я передаю id добавляемого пользователя?
-# ты передаешь его в мембершип криэйт, дорогая, не тупи)
+    return await WSMembershipCRUD.get_all_ws_members(
+        session=session, ws_id=workspace.id
+    )
 
 
 @membership_router.get(
@@ -155,7 +155,7 @@ async def add_member_to_ws(
     )
 async def get_ws_member(
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    user: UserRead = Depends(get_user_by_id),
+    user: UserRead = Depends(get_ws_user_by_id),
     session: AsyncSession = Depends(get_session)
 ):
     """
@@ -163,7 +163,7 @@ async def get_ws_member(
     with all their tasks of that workspace.
     Avaliable for any member of that workspace.
     """
-    return WSMembershipCRUD.get_ws_member(
+    return WSMembershipCRUD.get_ws_user_with_tasks(
         session=session,
         workspace=workspace,
         user=user
@@ -189,30 +189,31 @@ async def get_all_ws_members(
     )
 
 
-# удалить можно только юзера который уже член вс
 @membership_router.delete(
         "/{user_id}",
         status_code=status.HTTP_204_NO_CONTENT,
         response_model=List[UserRead]
     )
 async def delete_member_from_ws(
-    user: UserRead = Depends(get_user_by_id),
+    user: UserRead = Depends(is_admin_or_self),
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session)
 ):
     """
     Route for deleting user from workspace.
-    Avaliable for admin of that workspace or user themself.
+    Avaliable for admin of that workspace or user themselves.
     """
     await WSMembershipCRUD.delete_member_from_ws(
         session=session,
         user=user,
         workspace=workspace
     )
-    return await WSMembershipCRUD.get_all_ws_members(session=session)
+    return await WSMembershipCRUD.get_all_ws_members(
+        session=session, ws_id=workspace.id
+    )
+    # добавить запрет на удаление единственного админа
 
 
-# менять можно только статус юзера, который уже член воркспейса
 @membership_router.put(
     "/{user_id}",
     status_code=status.HTTP_200_OK,
@@ -220,7 +221,8 @@ async def delete_member_from_ws(
     dependencies=[Depends(is_ws_admin)]
 )
 async def update_ws_user_role(
-    updated_ws_user: MembershipCreate,
+    updated_user_status: MembershipUpdate,
+    user: UserRead = Depends(get_ws_user_by_id),
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session),
 ):
@@ -228,8 +230,12 @@ async def update_ws_user_role(
     Route for updating user status in the workspace.
     Avaliable for any admin of that workspace.
     """
-    return await WSMembershipCRUD.update_ws_user_role(
+    await WSMembershipCRUD.update_ws_user_role(
         session=session,
         workspace=workspace,
-        updated_ws_user=updated_ws_user
+        updated_user_status=updated_user_status,
+        user=user
+    )
+    return await WSMembershipCRUD.get_all_ws_members(
+        session=session, ws_id=workspace.id
     )

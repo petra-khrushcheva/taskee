@@ -16,7 +16,9 @@ class User(Base, SQLAlchemyBaseUserTableUUID):
         back_populates="creator", foreign_keys="Task.creator_id"
     )
     appointed_tasks: Mapped[list["Task"]] = relationship(
-        back_populates="executor", foreign_keys="Task.executor_id"
+        back_populates="executor",
+        foreign_keys="Task.executor_id",
+        order_by="desc(Task.created_at)"
     )
 
     workspaces: Mapped[list["WorkspaceUserAssociation"]] = relationship(
