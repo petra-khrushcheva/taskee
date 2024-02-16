@@ -1,20 +1,17 @@
-from typing import Annotated, TYPE_CHECKING
+from typing import Annotated
 from uuid import UUID
 
 from annotated_types import MaxLen
 from pydantic import BaseModel, ConfigDict
 
 from tasks.models import TaskStatus
-
-
-if TYPE_CHECKING:
-    from users.schemas import UserRead
+from users.schemas import UserRead
 
 
 class TaskBase(BaseModel):
     title: Annotated[str, MaxLen(50)]
     description: str
-    status: TaskStatus = TaskStatus.new
+    status: TaskStatus = TaskStatus.new.value
 # возможно value,
 # возможно в придется убрать str из самого энума, если алхимия будет ругаться
     # deadline

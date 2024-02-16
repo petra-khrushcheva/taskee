@@ -46,7 +46,7 @@ class WorkspaceCRUD():
             .filter_by(id=ws_id)
         )
         return await session.execute(stmt)
-# после можно добавить функционал, показывающий,
+# дальше можно будет добавить функционал, показывающий,
 # является ли каррент юзер исполнителем или создателем задачи.
 # нужно ли здесь скалярс или олл???
 
@@ -72,7 +72,6 @@ class WorkspaceCRUD():
         return workspaces
 # получить все воркспейсы с фильтрацией по айди керрент юзера,
 # к каждому воркспейсу добавить четыре задачи из него
-# Схема - Все группы + по 4 задачи в каждой группе
 # после можно добавить функционал, показывающий,
 # кто является исполнителем задачи.
 
@@ -93,8 +92,7 @@ class WorkspaceCRUD():
         for key, value in workspace_data.model_dump().items():
             setattr(workspace, key, value)
         await session.commit()
-        return workspace
-# Схема - ws_read (без списка задач)
+        return workspace  # refresh???
 
 
 class WSMembershipCRUD():
@@ -108,11 +106,6 @@ class WSMembershipCRUD():
         ws_membership = WorkspaceUserAssociation(**membership.model_dump())
         workspace.users.append(ws_membership)
         await session.commit()
-
-# add member to ws
-# добавленный пользователь получает статус юзера, если не указано другое
-# схема - список членов группы со статусами, по идее в ручке можно
-# использовать эту функцию и get_all_ws_members вместе
 
     @staticmethod
     async def get_ws_user(session: AsyncSession, ws_id: UUID, user_id: UUID):
@@ -138,6 +131,9 @@ class WSMembershipCRUD():
         user_role: Result = await session.execute(stmt)
         return user_role.scalar_one()  # ??? может и не скаляр, посмотрим на результат 
 
+    @staticmethod
+    async def get_ws_user_with_tasks():
+        pass
 
 # get member получить одного
 # доступность - любой член группы

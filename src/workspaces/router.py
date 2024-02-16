@@ -11,7 +11,9 @@ from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 from workspaces.dependencies import (
     is_ws_member, get_workspace_by_id, is_ws_admin
 )
-from users.dependencies import get_user_by_id, current_active_user as get_user
+from users.dependencies import (
+    get_user_by_id, current_active_user as current_user
+)
 from users.schemas import (
     UserRead, UserWithTasks
 )   # какая юзер схема здесь на самом деле нужна???
@@ -32,7 +34,7 @@ membership_router = APIRouter(
 async def create_workspace(
     ws_data: WorkspaceCreate,
     session: AsyncSession = Depends(get_session),
-    current_user: UserRead = Depends(get_user),
+    current_user: UserRead = Depends(current_user),
 ):
     """
     Route for creating a workspace.
@@ -67,7 +69,7 @@ async def get_workspace(
 @ws_router.get("/", response_model=List[WorkspaceWithTasks])
 async def get_workspaces(
     session: AsyncSession = Depends(get_session),
-    current_user: UserRead = Depends(get_user)
+    current_user: UserRead = Depends(current_user)
 ):
     """
     Route for retrieving all workspaces of a current user

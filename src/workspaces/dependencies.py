@@ -46,7 +46,7 @@ async def is_ws_member(
 
 
 async def is_ws_admin(
-        ws_id: UUID,
+        ws_id: Annotated[UUID, Path],
         user: User = Depends(is_ws_member),
         session: AsyncSession = Depends(get_session)
 ):
@@ -65,13 +65,13 @@ async def is_ws_admin(
 
 
 async def is_ws_user(
-        ws_id: UUID,
+        ws_id: Annotated[UUID, Path],
         user: User = Depends(is_ws_member),
         session: AsyncSession = Depends(get_session)
 ):
     """
     Checks if current user has workspace user rights.
-    (Are they allowed to create tasks).
+    (Are they allowed to create tasks in this workspace).
     """
     user_role = await WSMembershipCRUD.get_user_role_in_ws(
         session=session, ws_id=ws_id, user=user
@@ -82,6 +82,17 @@ async def is_ws_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="You are not authorised to perform this action"
         )
+
+
+async def is_admin_or_self(
+        user_id: Annotated[UUID, Path],
+        ws_id: Annotated[UUID, Path],
+        session: AsyncSession = Depends(get_session),
+        user: User = Depends(is_ws_member)
+):
+    if user.id == user_id:
+        return user
+    return await is_ws_admin(ws_id=ws_id, user=user, session=session)
 
 
 async def get_workspace_by_id(

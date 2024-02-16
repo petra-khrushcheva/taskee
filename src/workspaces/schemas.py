@@ -1,12 +1,10 @@
 from uuid import UUID
-from typing import TYPE_CHECKING
-from workspaces.models import GroupRole
 
 from pydantic import BaseModel, ConfigDict
 
-if TYPE_CHECKING:
-    from tasks.schemas import TaskRead
-    from users.schemas import UserRead
+from workspaces.models import GroupRole
+from users.schemas import UserRead
+from tasks.schemas import TaskRead
 
 
 class WorkspaceBase(BaseModel):
