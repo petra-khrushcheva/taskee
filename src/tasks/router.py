@@ -10,6 +10,7 @@ from tasks.services import TaskCRUD
 from workspaces.dependencies import is_ws_user, is_ws_admin
 from users.schemas import UserRead
 
+"""Router for task's CRUD"""
 router = APIRouter(prefix="/workspaces/{ws_id}/tasks", tags=["Tasks"])
 
 
@@ -20,6 +21,10 @@ async def create_task(
     session: AsyncSession = Depends(get_session),
     current_user: UserRead = Depends(is_ws_user),
 ):
+    """
+    Route for creating a task inside a workspace.
+    Avaliable for workspace members with statuses "admin" and "user".
+    """
     return await TaskCRUD.create_task(
         session=session,
         task_data=task_data,
@@ -30,6 +35,10 @@ async def create_task(
 
 @router.get("/{task_id}", response_model=TaskRead)
 async def get_task(task: TaskRead = Depends(get_ws_task_by_id)):
+    """
+    Route for retrieving a single task.
+    Avaliable for any member of its workspace.
+    """
     return task
 
 
@@ -42,6 +51,10 @@ async def delete_task(
     task: TaskRead = Depends(get_ws_task_by_id),
     session: AsyncSession = Depends(get_session),
 ):
+    """
+    Route for deleting a task.
+    Avaliable for workspace admin or task creator.
+    """
     return await TaskCRUD.delete_task(session=session, task=task)
 
 
@@ -56,6 +69,10 @@ async def update_task(
     task: TaskRead = Depends(get_ws_task_by_id),
     session: AsyncSession = Depends(get_session),
 ):
+    """
+    Route for updating task information, including status and executor_id.
+    Avaliable for workspace admin.
+    """
     return await TaskCRUD.update_task(
         session=session, task=task, task_data=task_data
     )
