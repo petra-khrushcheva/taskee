@@ -31,8 +31,7 @@ class WorkspaceWithTasks(WorkspaceRead):
 
 
 class MembershipUpdate(BaseModel):
-    user_role: GroupRole = GroupRole.user
-# возможно value,
+    user_role: GroupRole = GroupRole.user.value
 # возможно в придется убрать str из самого энума, если алхимия будет ругаться
 
 

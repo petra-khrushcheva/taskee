@@ -49,7 +49,7 @@ class WorkspaceCRUD():
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
-# дальше можно будет добавить функционал, показывающий,
+# здесь можно будет добавить функционал, показывающий,
 # является ли каррент юзер исполнителем или создателем задачи.
 
     @staticmethod
@@ -72,9 +72,7 @@ class WorkspaceCRUD():
         result: Result = await session.execute(stmt)
         workspaces = result.unique().scalars().all()
         return workspaces
-# получить все воркспейсы с фильтрацией по айди керрент юзера,
-# к каждому воркспейсу добавить четыре задачи из него
-# после можно добавить функционал, показывающий,
+# здесь можно добавить функционал, показывающий,
 # кто является исполнителем задачи.
 
     @staticmethod

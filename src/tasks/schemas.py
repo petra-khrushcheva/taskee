@@ -12,7 +12,6 @@ class TaskBase(BaseModel):
     title: Annotated[str, MaxLen(50)]
     description: str | None = None
     status: TaskStatus = TaskStatus.new.value
-# возможно value,
 # возможно в придется убрать str из самого энума, если алхимия будет ругаться
     # deadline
 
