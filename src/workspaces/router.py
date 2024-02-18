@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_session
 from workspaces.schemas import (
     WorkspaceRead, WorkspaceCreate, WorkspaceWithTasks, MembershipCreate,
-    WorkspaceUpdate, MembershipUpdate
+    UserWithTasks, WorkspaceUpdate, MembershipUpdate
 )
 from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 from workspaces.dependencies import (
@@ -14,9 +14,7 @@ from workspaces.dependencies import (
     is_admin_or_self
 )
 from users.dependencies import current_active_user as current_user
-from users.schemas import (
-    UserRead, UserWithTasks
-)
+from users.schemas import UserRead
 
 
 """Router for workspace CRUD"""
@@ -129,7 +127,7 @@ async def update_workspace(
     response_model=List[UserRead],
     dependencies=[Depends(is_ws_admin)]
 )
-async def add_member_to_ws(
+async def add_member_to_workspace(
     membership: MembershipCreate,
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session)
@@ -138,13 +136,10 @@ async def add_member_to_ws(
     Route for adding user to workspace.
     Avaliable for any admin of that workspace.
     """
-    await WSMembershipCRUD.add_member_to_ws(
+    return await WSMembershipCRUD.add_member_to_ws(
         session=session,
         workspace=workspace,
         membership=membership
-    )
-    return await WSMembershipCRUD.get_all_ws_members(
-        session=session, ws_id=workspace.id
     )
 
 
@@ -153,7 +148,7 @@ async def add_member_to_ws(
         response_model=UserWithTasks,
         dependencies=[Depends(is_ws_member)]
     )
-async def get_ws_member(
+async def get_workspace_member(
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     user: UserRead = Depends(get_ws_user_by_id),
     session: AsyncSession = Depends(get_session)
@@ -175,7 +170,7 @@ async def get_ws_member(
         response_model=List[UserRead],
         dependencies=[Depends(is_ws_member)]
     )
-async def get_all_ws_members(
+async def get_all_workspace_members(
     ws_id: UUID,
     session: AsyncSession = Depends(get_session)
 ):
@@ -191,10 +186,9 @@ async def get_all_ws_members(
 
 @membership_router.delete(
         "/{user_id}",
-        status_code=status.HTTP_204_NO_CONTENT,
-        response_model=List[UserRead]
+        status_code=status.HTTP_204_NO_CONTENT
     )
-async def delete_member_from_ws(
+async def delete_member_from_workspace(
     user: UserRead = Depends(is_admin_or_self),
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session)
@@ -203,13 +197,10 @@ async def delete_member_from_ws(
     Route for deleting user from workspace.
     Avaliable for admin of that workspace or user themselves.
     """
-    await WSMembershipCRUD.delete_member_from_ws(
+    return await WSMembershipCRUD.delete_member_from_ws(
         session=session,
         user=user,
         workspace=workspace
-    )
-    return await WSMembershipCRUD.get_all_ws_members(
-        session=session, ws_id=workspace.id
     )
     # добавить запрет на удаление единственного админа
 
@@ -220,7 +211,7 @@ async def delete_member_from_ws(
     response_model=List[UserRead],
     dependencies=[Depends(is_ws_admin)]
 )
-async def update_ws_user_role(
+async def update_workspace_user_role(
     updated_user_status: MembershipUpdate,
     user: UserRead = Depends(get_ws_user_by_id),
     workspace: WorkspaceRead = Depends(get_workspace_by_id),

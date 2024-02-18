@@ -40,7 +40,7 @@ class MembershipCreate(MembershipUpdate):
 
 
 class WorkspaceUser(UserRead):
-    role_in_ws: GroupRole
+    user_role: GroupRole
 
 
 class UserWithTasks(WorkspaceUser):
