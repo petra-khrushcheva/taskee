@@ -58,13 +58,17 @@ async def get_workspace(
     Route for retrieving a workspace with all its tasks.
     Avaliable for any member of that workspace
     """
-    workspace = WorkspaceCRUD.get_workspace_with_tasks(
+    return await WorkspaceCRUD.get_workspace_with_tasks(
         session=session, ws_id=ws_id,  # current_user=current_user
     )
-    return workspace
 
 
-@ws_router.get("/", response_model=List[WorkspaceWithTasks])
+
+@ws_router.get("/", 
+            #    response_model=List[WorkspaceWithTasks]
+               response_model=List[WorkspaceRead]
+               
+               )
 async def get_workspaces(
     session: AsyncSession = Depends(get_session),
     current_user: UserRead = Depends(current_user)
@@ -101,13 +105,13 @@ async def delete_workspace(
 @ws_router.put(
         "/{ws_id}",
         status_code=status.HTTP_200_OK,
-        response_model=WorkspaceRead
+        response_model=WorkspaceRead,
+        dependencies=[Depends(is_ws_admin)]
     )
 async def update_workspace(
-    ws_data: WorkspaceUpdate,
+    workspace_data: WorkspaceUpdate,
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    session: AsyncSession = Depends(get_session),
-    current_user: UserRead = Depends(is_ws_admin)
+    session: AsyncSession = Depends(get_session)
 ):
     """
     Route for updating workspace information,
@@ -117,8 +121,7 @@ async def update_workspace(
     return await WorkspaceCRUD.update_workspace(
         session=session,
         workspace=workspace,
-        ws_data=ws_data,
-        current_user=current_user
+        workspace_data=workspace_data
     )
 
 

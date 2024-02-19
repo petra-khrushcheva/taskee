@@ -19,7 +19,7 @@ async def is_user_in_workspace(
     """
     Checks if user is associated with workspace in any role.
     """
-    user = await WSMembershipCRUD.get_ws_user_and_role(
+    user = await WSMembershipCRUD.get_ws_user(
         session=session, ws_id=ws_id, user_id=user_id
     )
     if user is not None:

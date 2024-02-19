@@ -6,7 +6,7 @@ from core.config import settings
 SECRET = settings.secret_key
 
 
-bearer_transport = BearerTransport(tokenUrl="auth/jwt/login")
+bearer_transport = BearerTransport(tokenUrl="v1/auth/jwt/login")
 
 
 def get_jwt_strategy() -> JWTStrategy:

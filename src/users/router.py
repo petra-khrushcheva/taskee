@@ -7,6 +7,12 @@ from users.schemas import UserCreate, UserRead, UserUpdate
 router = APIRouter()
 
 router.include_router(
+    fastapi_users.get_users_router(UserRead, UserUpdate),
+    prefix="/users",
+    tags=["Users"],
+)
+
+router.include_router(
     fastapi_users.get_register_router(UserRead, UserCreate),
     prefix="/auth",
     tags=["Auth"],
@@ -24,8 +30,3 @@ router.include_router(
     tags=["Auth"],
 )
 
-router.include_router(
-    fastapi_users.get_users_router(UserRead, UserUpdate),
-    prefix="/users",
-    tags=["Users"],
-)

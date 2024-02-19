@@ -22,7 +22,8 @@ class User(Base, SQLAlchemyBaseUserTableUUID):
     )
 
     workspaces: Mapped[list["WorkspaceUserAssociation"]] = relationship(
-        back_populates="user"
+        back_populates="user",
+        cascade="all, delete"
     )
 
     @hybrid_property

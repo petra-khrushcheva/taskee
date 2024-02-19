@@ -14,7 +14,8 @@ class Workspace(Base):
     description: Mapped[str | None] = mapped_column(Text)
 
     users: Mapped[list["WorkspaceUserAssociation"]] = relationship(
-        back_populates="workspace"
+        back_populates="workspace",
+        cascade="all, delete"
     )
     tasks: Mapped[list["Task"]] = relationship(
         back_populates="workspace",
