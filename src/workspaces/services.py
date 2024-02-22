@@ -104,10 +104,12 @@ class WSMembershipCRUD:
 
     @staticmethod
     async def add_member_to_ws(
-        session: AsyncSession, workspace: Workspace, membership: MembershipCreate
+        session: AsyncSession,
+        workspace: Workspace,
+        membership: MembershipCreate
     ):
-        ws_membership = WorkspaceUserAssociation(**membership.model_dump())
-        workspace.users.append(ws_membership)
+        ws_membership = WorkspaceUserAssociation(workspace_id=workspace.id, **membership.model_dump())
+        session.add(ws_membership)
         await session.commit()
 
     @staticmethod
@@ -149,7 +151,7 @@ class WSMembershipCRUD:
             .where(WorkspaceUserAssociation.workspace_id == ws_id)
         )
         result: Result = await session.execute(stmt)
-        users_with_statuses = result.scalars().all()
+        users_with_statuses = result.all()
         return users_with_statuses
 
     @staticmethod

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.database import get_session
 from workspaces.schemas import (
     WorkspaceRead, WorkspaceCreate, WorkspaceWithTasks, MembershipCreate,
-    UserWithTasks, WorkspaceUpdate, MembershipUpdate
+    UserWithTasks, WorkspaceUpdate, MembershipUpdate, WorkspaceUser
 )
 from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 from workspaces.dependencies import (
@@ -61,7 +61,6 @@ async def get_workspace(
     return await WorkspaceCRUD.get_workspace_with_tasks(
         session=session, ws_id=ws_id,  # current_user=current_user
     )
-
 
 
 @ws_router.get("/", 
@@ -127,7 +126,6 @@ async def update_workspace(
 
 @membership_router.post(
     "/", status_code=status.HTTP_201_CREATED,
-    response_model=List[UserRead],
     dependencies=[Depends(is_ws_admin)]
 )
 async def add_member_to_workspace(
@@ -170,7 +168,7 @@ async def get_workspace_member(
 
 @membership_router.get(
         "/",
-        response_model=List[UserRead],
+        response_model=List[WorkspaceUser],
         dependencies=[Depends(is_ws_member)]
     )
 async def get_all_workspace_members(
