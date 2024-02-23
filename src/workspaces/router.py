@@ -187,10 +187,11 @@ async def get_all_workspace_members(
 
 @membership_router.delete(
         "/{user_id}",
-        status_code=status.HTTP_204_NO_CONTENT
+        status_code=status.HTTP_204_NO_CONTENT,
+        dependencies=[Depends(is_admin_or_self)]
     )
 async def delete_member_from_workspace(
-    user: UserRead = Depends(is_admin_or_self),
+    user: UserRead = Depends(get_ws_user_by_id),
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     session: AsyncSession = Depends(get_session)
 ):

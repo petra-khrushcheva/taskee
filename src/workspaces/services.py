@@ -137,8 +137,12 @@ class WSMembershipCRUD:
         stmt = (
             select(User)
             .where(User.id == user.id)
-            .options(selectinload(User.appointed_tasks.and_(Task.workspace_id == workspace.id, Task.executor_id == User.id)))
-            .options(selectinload(User.workspaces.and_(WorkspaceUserAssociation.workspace_id == workspace.id)))
+            .options(selectinload(User.appointed_tasks.and_(
+                Task.workspace_id == workspace.id, Task.executor_id == User.id
+            )))
+            .options(selectinload(User.workspaces.and_(
+                WorkspaceUserAssociation.workspace_id == workspace.id
+            )))
         )
         result: Result = await session.execute(stmt)
         user = result.scalar_one()
@@ -147,12 +151,15 @@ class WSMembershipCRUD:
     @staticmethod
     async def get_all_ws_members(session: AsyncSession, ws_id: UUID):
         stmt = (
-            select(User.id, User.full_name, WorkspaceUserAssociation.user_role)
+            select(User)
             .join(WorkspaceUserAssociation)
             .where(WorkspaceUserAssociation.workspace_id == ws_id)
+            .options(selectinload(User.workspaces.and_(
+                WorkspaceUserAssociation.workspace_id == ws_id
+            )))
         )
         result: Result = await session.execute(stmt)
-        return result.all()
+        return result.scalars().all()
 
     @staticmethod
     async def delete_member_from_ws(
@@ -162,7 +169,8 @@ class WSMembershipCRUD:
             WorkspaceUserAssociation.user_id == user.id,
             WorkspaceUserAssociation.workspace_id == workspace.id,
         )
-        membership = await session.execute(stmt)
+        result = await session.execute(stmt)
+        membership = result.scalar_one()
         await session.delete(membership)
         await session.commit()
 
