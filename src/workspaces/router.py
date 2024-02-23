@@ -159,7 +159,7 @@ async def get_workspace_member(
     with all their tasks of that workspace.
     Avaliable for any member of that workspace.
     """
-    return WSMembershipCRUD.get_ws_user_with_tasks(
+    return await WSMembershipCRUD.get_ws_user_with_tasks(
         session=session,
         workspace=workspace,
         user=user

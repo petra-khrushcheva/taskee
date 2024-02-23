@@ -2,6 +2,7 @@ from fastapi_users.db import SQLAlchemyBaseUserTableUUID
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.ext.associationproxy import association_proxy, AssociationProxy
 
 from core.basemodels import Base
 
@@ -18,12 +19,14 @@ class User(Base, SQLAlchemyBaseUserTableUUID):
     appointed_tasks: Mapped[list["Task"]] = relationship(
         back_populates="executor",
         foreign_keys="Task.executor_id",
-        order_by="desc(Task.created_at)"
+        order_by="desc(Task.created_at)",
     )
 
     workspaces: Mapped[list["WorkspaceUserAssociation"]] = relationship(
-        back_populates="user",
-        cascade="all, delete"
+        back_populates="user", cascade="all, delete"
+    )
+    user_role: AssociationProxy[list[str]] = association_proxy(
+        "workspaces", "user_role"
     )
 
     @hybrid_property

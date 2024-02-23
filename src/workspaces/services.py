@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, contains_eager
+from sqlalchemy.orm import selectinload
 
 from users.models import User
 from workspaces.models import GroupRole, Workspace, WorkspaceUserAssociation
@@ -136,12 +136,13 @@ class WSMembershipCRUD:
     ):
         stmt = (
             select(User)
-            .join(Task)
-            .where(Task.workspace_id == workspace.id, User.id == user.id)
-            .options(selectinload(User.appointed_tasks))
+            .where(User.id == user.id)
+            .options(selectinload(User.appointed_tasks.and_(Task.workspace_id == workspace.id, Task.executor_id == User.id)))
+            .options(selectinload(User.workspaces.and_(WorkspaceUserAssociation.workspace_id == workspace.id)))
         )
-        user_with_tasks: Result = session.execute(stmt)
-        return user_with_tasks.scalar_one()
+        result: Result = await session.execute(stmt)
+        user = result.scalar_one()
+        return user
 
     @staticmethod
     async def get_all_ws_members(session: AsyncSession, ws_id: UUID):
@@ -151,8 +152,7 @@ class WSMembershipCRUD:
             .where(WorkspaceUserAssociation.workspace_id == ws_id)
         )
         result: Result = await session.execute(stmt)
-        users_with_statuses = result.all()
-        return users_with_statuses
+        return result.all()
 
     @staticmethod
     async def delete_member_from_ws(

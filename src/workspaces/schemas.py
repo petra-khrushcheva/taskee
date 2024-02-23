@@ -40,8 +40,10 @@ class MembershipCreate(MembershipUpdate):
 
 
 class WorkspaceUser(UserRead):
-    user_role: GroupRole
+    user_role: list[GroupRole]
 
 
 class UserWithTasks(WorkspaceUser):
-    tasks: list[TaskRead]
+    # model_config = ConfigDict(from_attributes=True)
+
+    appointed_tasks: list[TaskRead] | None = None

@@ -24,4 +24,7 @@ class TaskRead(TaskBase):
     model_config = ConfigDict(from_attributes=True)
 
     id: UUID
+
+
+class TaskWithExecutor(TaskRead):
     executor: UserRead | None = None
