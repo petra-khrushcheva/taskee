@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict
 
 from workspaces.models import GroupRole
 from users.schemas import UserRead
-from tasks.schemas import TaskRead
+from tasks.schemas import TaskWithExecutor, TaskRead
 
 
 class WorkspaceBase(BaseModel):
@@ -27,7 +27,7 @@ class WorkspaceRead(WorkspaceBase):
 
 
 class WorkspaceWithTasks(WorkspaceRead):
-    tasks: list[TaskRead]
+    tasks: list[TaskWithExecutor]
 
 
 class MembershipUpdate(BaseModel):

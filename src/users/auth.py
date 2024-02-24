@@ -10,7 +10,9 @@ bearer_transport = BearerTransport(tokenUrl="v1/auth/jwt/login")
 
 
 def get_jwt_strategy() -> JWTStrategy:
-    return JWTStrategy(secret=SECRET, lifetime_seconds=3600)
+    return JWTStrategy(
+        secret=SECRET, lifetime_seconds=settings.jwt_lifetime_seconds
+    )
 
 
 auth_backend = AuthenticationBackend(

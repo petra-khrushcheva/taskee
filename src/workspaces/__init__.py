@@ -1,2 +1,1 @@
-from .models import Workspace, WorkspaceUserAssociation
-
+from .models import Workspace, WorkspaceUserAssociation  # noqa

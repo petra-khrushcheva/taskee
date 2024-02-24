@@ -63,10 +63,7 @@ async def get_workspace(
     )
 
 
-@ws_router.get("/",
-               #    response_model=List[WorkspaceWithTasks]
-               response_model=List[WorkspaceRead]
-               )
+@ws_router.get("/", response_model=List[WorkspaceWithTasks])
 async def get_workspaces(
     session: AsyncSession = Depends(get_session),
     current_user: UserRead = Depends(current_user)

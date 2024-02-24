@@ -3,7 +3,7 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import selectinload, contains_eager
 
 from users.models import User
 from workspaces.models import GroupRole, Workspace, WorkspaceUserAssociation
@@ -16,7 +16,7 @@ from workspaces.schemas import (
 from tasks.models import Task
 
 
-TASKS_PER_WS_FRONT_PAGE_LIMIT = 2
+TASKS_PER_WS_FRONT_PAGE_LIMIT = 4
 
 
 class WorkspaceCRUD:
@@ -53,32 +53,30 @@ class WorkspaceCRUD:
         result = await session.execute(stmt)
         workspace = result.scalar_one_or_none()
         return workspace
-
     # здесь можно будет добавить функционал, показывающий,
     # является ли каррент юзер исполнителем или создателем задачи.
 
     @staticmethod
     async def get_workspaces(session: AsyncSession, current_user: User):
-        # subq = (
-        #     select(Task.id.label("task_id"))
-        #     .filter(Task.workspace_id == Workspace.id)
-        #     .order_by(Task.created_at.desc())
-        #     .limit(TASKS_PER_WS_FRONT_PAGE_LIMIT)
-        #     .scalar_subquery()  # я хз будет ли работать эта хуйня, может здесь просто сабкваери???
-        #     .correlate(Workspace)
-        #     )
+        subq = (
+            select(Task.id.label("task_id"))
+            .filter(Task.workspace_id == Workspace.id)
+            .order_by(Task.created_at.desc())
+            .limit(TASKS_PER_WS_FRONT_PAGE_LIMIT)
+            .scalar_subquery()
+            .correlate(Workspace)
+            )
         stmt = (
-            select(Workspace).join(WorkspaceUserAssociation)
-            # .join(Task, Task.id.in_(subq))
+            select(Workspace)
+            .join(WorkspaceUserAssociation)
+            .join(Task, Task.id.in_(subq), isouter=True)
             .where(WorkspaceUserAssociation.user_id == current_user.id)
-            # .options(contains_eager(Workspace.tasks))
+            .options(contains_eager(Workspace.tasks).joinedload(Task.executor))
         )
         result: Result = await session.execute(stmt)
-        workspaces = result.scalars().all()
+        workspaces = result.unique().scalars().all()
+        print(list(workspaces))
         return list(workspaces)
-
-    # здесь можно добавить функционал, показывающий,
-    # кто является исполнителем задачи.
 
     @staticmethod
     async def delete_workspace(session: AsyncSession, workspace: Workspace):

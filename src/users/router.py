@@ -29,4 +29,3 @@ router.include_router(
     prefix="/auth",
     tags=["Auth"],
 )
-
