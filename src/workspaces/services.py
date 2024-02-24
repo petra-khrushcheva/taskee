@@ -8,15 +8,15 @@ from sqlalchemy.orm import selectinload
 from users.models import User
 from workspaces.models import GroupRole, Workspace, WorkspaceUserAssociation
 from workspaces.schemas import (
-    WorkspaceCreate,
     MembershipCreate,
     MembershipUpdate,
-    WorkspaceUpdate,
+    WorkspaceCreate,
+    WorkspaceUpdate
 )
 from tasks.models import Task
 
 
-TASKS_PER_WS_FRONT_PAGE_LIMIT = 4
+TASKS_PER_WS_FRONT_PAGE_LIMIT = 2
 
 
 class WorkspaceCRUD:
@@ -88,7 +88,9 @@ class WorkspaceCRUD:
 
     @staticmethod
     async def update_workspace(
-        session: AsyncSession, workspace: Workspace, workspace_data: WorkspaceUpdate
+        session: AsyncSession,
+        workspace: Workspace,
+        workspace_data: WorkspaceUpdate
     ):
         for key, value in (
             workspace_data.model_dump(exclude_unset=True)
@@ -108,7 +110,9 @@ class WSMembershipCRUD:
         workspace: Workspace,
         membership: MembershipCreate
     ):
-        ws_membership = WorkspaceUserAssociation(workspace_id=workspace.id, **membership.model_dump())
+        ws_membership = WorkspaceUserAssociation(
+            workspace_id=workspace.id, **membership.model_dump()
+        )
         session.add(ws_membership)
         await session.commit()
 
@@ -117,18 +121,23 @@ class WSMembershipCRUD:
         stmt = (
             select(User)
             .join(WorkspaceUserAssociation)
-            .where(User.id == user_id, WorkspaceUserAssociation.workspace_id == ws_id)
+            .where(
+                User.id == user_id,
+                WorkspaceUserAssociation.workspace_id == ws_id
+            )
         )
         user: Result = await session.execute(stmt)
         return user.scalar_one_or_none()
 
     @staticmethod
-    async def get_user_role_in_ws(session: AsyncSession, user: User, ws_id: UUID):
+    async def get_user_role_in_ws(
+        session: AsyncSession, user: User, ws_id: UUID
+    ):
         stmt = select(WorkspaceUserAssociation.user_role).filter_by(
             user_id=user.id, workspace_id=ws_id
         )
         user_role: Result = await session.execute(stmt)
-        return user_role.scalar_one()  # ??? может и не скаляр, посмотрим на результат
+        return user_role.scalar_one()
 
     @staticmethod
     async def get_ws_user_with_tasks(
@@ -185,6 +194,7 @@ class WSMembershipCRUD:
             WorkspaceUserAssociation.user_id == user.id,
             WorkspaceUserAssociation.workspace_id == workspace.id,
         )
-        membership: WorkspaceUserAssociation = await session.execute(stmt).scalar_one()
+        result = await session.execute(stmt)
+        membership: WorkspaceUserAssociation = result.scalar_one()
         membership.user_role = updated_user_status.user_role
         await session.commit()

@@ -12,12 +12,15 @@ class TaskBase(BaseModel):
     title: Annotated[str, MaxLen(50)]
     description: str | None = None
     status: TaskStatus = TaskStatus.new.value
-# возможно в придется убрать str из самого энума, если алхимия будет ругаться
     # deadline
 
 
 class TaskCreate(TaskBase):
     executor_id: UUID | None = None
+
+
+class TaskUpdate(TaskCreate):
+    title: str | None = None
 
 
 class TaskRead(TaskBase):

@@ -26,7 +26,13 @@ class TaskCRUD():
         session.add(task)
         await session.commit()
         await session.refresh(task)
-        return task
+        stmt = (
+            select(Task)
+            .options(joinedload(Task.executor))
+            .filter_by(id=task.id)
+        )
+        new_task = await session.execute(stmt)
+        return new_task.scalar_one()
 
     @staticmethod
     async def get_ws_task(session: AsyncSession, ws_id: UUID, task_id: UUID):
@@ -54,7 +60,8 @@ class TaskCRUD():
         task: Task,
         task_data: TaskCreate
     ):
-        for key, value in task_data.model_dump().items():
+        for key, value in task_data.model_dump(exclude_unset=True).items():
             setattr(task, key, value)
         await session.commit()
+        await session.refresh(task)
         return task

@@ -32,7 +32,6 @@ class WorkspaceWithTasks(WorkspaceRead):
 
 class MembershipUpdate(BaseModel):
     user_role: GroupRole = GroupRole.user.value
-# возможно в придется убрать str из самого энума, если алхимия будет ругаться
 
 
 class MembershipCreate(MembershipUpdate):
@@ -44,6 +43,4 @@ class WorkspaceUser(UserRead):
 
 
 class UserWithTasks(WorkspaceUser):
-    # model_config = ConfigDict(from_attributes=True)
-
     appointed_tasks: list[TaskRead] | None = None

@@ -5,13 +5,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_session
 from workspaces.schemas import (
-    WorkspaceRead, WorkspaceCreate, WorkspaceWithTasks, MembershipCreate,
-    UserWithTasks, WorkspaceUpdate, MembershipUpdate, WorkspaceUser
+    MembershipUpdate, MembershipCreate, UserWithTasks, WorkspaceCreate,
+    WorkspaceRead, WorkspaceUpdate, WorkspaceUser, WorkspaceWithTasks
 )
 from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 from workspaces.dependencies import (
-    is_ws_member, get_workspace_by_id, is_ws_admin, get_ws_user_by_id,
-    is_admin_or_self
+    get_workspace_by_id, get_ws_user_by_id,
+    is_admin_or_self, is_ws_admin, is_ws_member
 )
 from users.dependencies import current_active_user as current_user
 from users.schemas import UserRead
@@ -63,10 +63,9 @@ async def get_workspace(
     )
 
 
-@ws_router.get("/", 
-            #    response_model=List[WorkspaceWithTasks]
+@ws_router.get("/",
+               #    response_model=List[WorkspaceWithTasks]
                response_model=List[WorkspaceRead]
-               
                )
 async def get_workspaces(
     session: AsyncSession = Depends(get_session),
@@ -210,7 +209,6 @@ async def delete_member_from_workspace(
 @membership_router.put(
     "/{user_id}",
     status_code=status.HTTP_200_OK,
-    response_model=List[UserRead],
     dependencies=[Depends(is_ws_admin)]
 )
 async def update_workspace_user_role(
@@ -228,7 +226,4 @@ async def update_workspace_user_role(
         workspace=workspace,
         updated_user_status=updated_user_status,
         user=user
-    )
-    return await WSMembershipCRUD.get_all_ws_members(
-        session=session, ws_id=workspace.id
     )
