@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     secret_key: str
 
     project_name: str
-    version: str
+    project_version: str
     jwt_lifetime_seconds: int
 
     model_config = SettingsConfigDict(

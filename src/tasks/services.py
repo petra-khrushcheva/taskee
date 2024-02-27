@@ -4,9 +4,9 @@ from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
-from tasks.models import Task
-from tasks.schemas import TaskCreate
-from users.models import User
+from src.tasks.models import Task
+from src.tasks.schemas import TaskCreate
+from src.users.models import User
 
 
 class TaskCRUD():

@@ -1,1 +1,1 @@
-from .models import Task  # noqa
+from src.tasks.models import Task  # noqa

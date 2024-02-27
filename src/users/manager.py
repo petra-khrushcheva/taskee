@@ -6,10 +6,10 @@ from fastapi_users import BaseUserManager, FastAPIUsers, UUIDIDMixin
 from fastapi_users.db import SQLAlchemyUserDatabase
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.config import settings
-from core.database import get_session
-from users.auth import auth_backend
-from users.models import User
+from src.core.config import settings
+from src.core.database import get_session
+from src.users.auth import auth_backend
+from src.users.models import User
 
 SECRET = settings.secret_key
 

@@ -4,7 +4,7 @@ from uuid import UUID
 from sqlalchemy import ForeignKey, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from core.basemodels import Base
+from src.core.basemodels import Base
 
 
 class Workspace(Base):

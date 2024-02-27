@@ -1,4 +1,4 @@
-from users.manager import fastapi_users
+from src.users.manager import fastapi_users
 
 current_user = fastapi_users.current_user()
 

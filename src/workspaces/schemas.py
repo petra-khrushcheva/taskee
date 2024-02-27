@@ -2,9 +2,9 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
 
-from workspaces.models import GroupRole
-from users.schemas import UserRead
-from tasks.schemas import TaskWithExecutor, TaskRead
+from src.workspaces.models import GroupRole
+from src.users.schemas import UserRead
+from src.tasks.schemas import TaskWithExecutor, TaskRead
 
 
 class WorkspaceBase(BaseModel):

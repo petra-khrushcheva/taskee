@@ -6,11 +6,11 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from core.basemodels import Base
-from core.config import settings
-from tasks.models import Task
-from users.models import User
-from workspaces.models import Workspace, WorkspaceUserAssociation
+from src.core.basemodels import Base
+from src.core.config import settings
+from src.tasks.models import Task  # noqa
+from src.users.models import User  # noqa
+from src.workspaces.models import Workspace, WorkspaceUserAssociation  # noqa
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

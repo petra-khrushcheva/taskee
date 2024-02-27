@@ -4,13 +4,13 @@ from uuid import UUID
 from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import get_session
-from workspaces.models import GroupRole
-from workspaces.services import WSMembershipCRUD
-from tasks.services import TaskCRUD
-from users.dependencies import current_active_user as current_user
-from users.models import User
-from tasks.models import Task
+from src.core.database import get_session
+from src.workspaces.models import GroupRole
+from src.workspaces.services import WSMembershipCRUD
+from src.tasks.models import Task
+from src.tasks.services import TaskCRUD
+from src.users.dependencies import current_active_user as current_user
+from src.users.models import User
 
 
 async def get_ws_task_by_id(

@@ -4,5 +4,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app
 COPY ./requirements.txt /app/requirements.txt
 RUN pip3 install --no-cache-dir --upgrade -r /app/requirements.txt
-COPY ./src /app/src
+COPY ./alembic.ini /app/
+COPY ./migrations /app/migrations/
+COPY ./src /app/src/
 EXPOSE 8000

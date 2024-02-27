@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.ext.associationproxy import association_proxy, AssociationProxy
 
-from core.basemodels import Base
+from src.core.basemodels import Base
 
 
 class User(Base, SQLAlchemyBaseUserTableUUID):

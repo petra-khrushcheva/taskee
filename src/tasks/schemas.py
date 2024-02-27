@@ -4,8 +4,8 @@ from uuid import UUID
 from annotated_types import MaxLen
 from pydantic import BaseModel, ConfigDict
 
-from tasks.models import TaskStatus
-from users.schemas import UserRead
+from src.tasks.models import TaskStatus
+from src.users.schemas import UserRead
 
 
 class TaskBase(BaseModel):

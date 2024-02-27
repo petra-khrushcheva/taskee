@@ -5,15 +5,17 @@ from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload, contains_eager
 
-from users.models import User
-from workspaces.models import GroupRole, Workspace, WorkspaceUserAssociation
-from workspaces.schemas import (
+from src.users.models import User
+from src.workspaces.models import (
+    GroupRole, Workspace, WorkspaceUserAssociation
+)
+from src.workspaces.schemas import (
     MembershipCreate,
     MembershipUpdate,
     WorkspaceCreate,
     WorkspaceUpdate
 )
-from tasks.models import Task
+from src.tasks.models import Task
 
 
 TASKS_PER_WS_FRONT_PAGE_LIMIT = 4

@@ -1,3 +1,3 @@
-from tasks import Task  # noqa
-from users import User  # noqa
-from workspaces import Workspace, WorkspaceUserAssociation  # noqa
+from src.tasks import Task  # noqa
+from src.users import User  # noqa
+from src.workspaces import Workspace, WorkspaceUserAssociation  # noqa

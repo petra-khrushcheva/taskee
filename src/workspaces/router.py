@@ -3,18 +3,18 @@ from uuid import UUID
 from fastapi import APIRouter, status, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import get_session
-from workspaces.schemas import (
+from src.core.database import get_session
+from src.workspaces.schemas import (
     MembershipUpdate, MembershipCreate, UserWithTasks, WorkspaceCreate,
     WorkspaceRead, WorkspaceUpdate, WorkspaceUser, WorkspaceWithTasks
 )
-from workspaces.services import WorkspaceCRUD, WSMembershipCRUD
-from workspaces.dependencies import (
+from src.workspaces.services import WorkspaceCRUD, WSMembershipCRUD
+from src.workspaces.dependencies import (
     get_workspace_by_id, get_ws_user_by_id,
     is_admin_or_self, is_ws_admin, is_ws_member
 )
-from users.dependencies import current_active_user as current_user
-from users.schemas import UserRead
+from src.users.dependencies import current_active_user as current_user
+from src.users.schemas import UserRead
 
 
 """Router for workspace CRUD"""

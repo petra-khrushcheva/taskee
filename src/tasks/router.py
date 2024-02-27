@@ -3,14 +3,18 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import get_session
-from tasks.dependencies import get_ws_task_by_id, is_ws_admin_or_task_creator
-from tasks.schemas import TaskRead, TaskCreate, TaskWithExecutor, TaskUpdate
-from tasks.services import TaskCRUD
-from workspaces.dependencies import (
+from src.core.database import get_session
+from src.tasks.dependencies import (
+    get_ws_task_by_id, is_ws_admin_or_task_creator
+)
+from src.tasks.schemas import (
+    TaskRead, TaskCreate, TaskWithExecutor, TaskUpdate
+)
+from src.tasks.services import TaskCRUD
+from src.workspaces.dependencies import (
     is_user_in_workspace, is_ws_user, is_ws_admin
 )
-from users.schemas import UserRead
+from src.users.schemas import UserRead
 
 """Router for task's CRUD"""
 router = APIRouter(prefix="/workspaces/{ws_id}/tasks", tags=["Tasks"])
