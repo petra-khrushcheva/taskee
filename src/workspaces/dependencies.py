@@ -116,12 +116,7 @@ async def get_ws_user_by_id(
     Checks if user declared in the path
     is associated with workspace in any role.
     """
-    user = await WSMembershipCRUD.get_ws_user(
+    user = await is_user_in_workspace(
         session=session, ws_id=ws_id, user_id=user_id
     )
-    if user is not None:
-        return user
-    raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"There is no user {user_id} in workspace {ws_id}"
-        )
+    return user
