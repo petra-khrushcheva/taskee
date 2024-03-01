@@ -34,12 +34,14 @@ class Task(Base):
         ForeignKey("workspaces.id", ondelete="CASCADE")
     )
 
-    creator: Mapped["User"] = relationship(
+    creator: Mapped["User"] = relationship(  # noqa: F821
         back_populates="created_tasks", foreign_keys=[creator_id]
     )
-    executor: Mapped["User"] = relationship(
+    executor: Mapped["User"] = relationship(  # noqa: F821
         back_populates="appointed_tasks", foreign_keys=[executor_id]
     )
-    workspace: Mapped["Workspace"] = relationship(back_populates="tasks")
+    workspace: Mapped["Workspace"] = relationship(  # noqa: F821
+        back_populates="tasks"
+    )
 
     # deadline (default - in a month)

@@ -3,20 +3,14 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload, contains_eager
+from sqlalchemy.orm import contains_eager, selectinload
 
-from src.users.models import User
-from src.workspaces.models import (
-    GroupRole, Workspace, WorkspaceUserAssociation
-)
-from src.workspaces.schemas import (
-    MembershipCreate,
-    MembershipUpdate,
-    WorkspaceCreate,
-    WorkspaceUpdate
-)
 from src.tasks.models import Task
-
+from src.users.models import User
+from src.workspaces.models import (GroupRole, Workspace,
+                                   WorkspaceUserAssociation)
+from src.workspaces.schemas import (MembershipCreate, MembershipUpdate,
+                                    WorkspaceCreate, WorkspaceUpdate)
 
 TASKS_PER_WS_FRONT_PAGE_LIMIT = 4
 

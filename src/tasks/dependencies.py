@@ -5,12 +5,12 @@ from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.core.database import get_session
-from src.workspaces.models import GroupRole
-from src.workspaces.services import WSMembershipCRUD
 from src.tasks.models import Task
 from src.tasks.services import TaskCRUD
 from src.users.dependencies import current_active_user as current_user
 from src.users.models import User
+from src.workspaces.models import GroupRole
+from src.workspaces.services import WSMembershipCRUD
 
 
 async def get_ws_task_by_id(

@@ -17,7 +17,7 @@ class Workspace(Base):
         back_populates="workspace",
         cascade="all, delete"
     )
-    tasks: Mapped[list["Task"]] = relationship(
+    tasks: Mapped[list["Task"]] = relationship(  # noqa: F821
         back_populates="workspace",
         primaryjoin=(
             "and_(Workspace.id==Task.workspace_id, Task.is_active==True)"
@@ -69,6 +69,6 @@ class WorkspaceUserAssociation(Base):
         back_populates="users",
     )
 
-    user: Mapped["User"] = relationship(
+    user: Mapped["User"] = relationship(  # noqa: F821
         back_populates="workspaces",
     )
