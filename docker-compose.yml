@@ -18,7 +18,7 @@ services:
 
   web:
     container_name: backend
-    image: backend # здесь нужно указать имя образа, который будет создавать github actions
+    image: petrakhrushcheva/taskee
     environment:
       - DB_HOSTNAME=db
       - DB_USERNAME=${DB_USERNAME}

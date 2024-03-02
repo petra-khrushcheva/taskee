@@ -47,8 +47,7 @@ class WorkspaceCRUD:
             .filter_by(id=ws_id)
         )
         result = await session.execute(stmt)
-        workspace = result.scalar_one_or_none()
-        return workspace
+        return result.scalar_one_or_none()
     # здесь можно будет добавить функционал, показывающий,
     # является ли каррент юзер исполнителем или создателем задачи.
 
@@ -148,8 +147,7 @@ class WSMembershipCRUD:
             )))
         )
         result: Result = await session.execute(stmt)
-        user = result.scalar_one()
-        return user
+        return result.scalar_one()
 
     @staticmethod
     async def get_all_ws_members(session: AsyncSession, ws_id: UUID):

@@ -116,7 +116,6 @@ async def get_ws_user_by_id(
     Checks if user declared in the path
     is associated with workspace in any role.
     """
-    user = await is_user_in_workspace(
+    return await is_user_in_workspace(
         session=session, ws_id=ws_id, user_id=user_id
     )
-    return user

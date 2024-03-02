@@ -1,7 +1,7 @@
 """initial
 
 Revision ID: 778a1e686300
-Revises: 
+Revises:
 Create Date: 2024-02-17 23:09:19.398504
 
 """
@@ -26,9 +26,14 @@ def upgrade() -> None:
         sa.Column("first_name", sa.String(length=50), nullable=False),
         sa.Column("last_name", sa.String(length=50), nullable=False),
         sa.Column(
-            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
+            "id",
+            sa.Uuid(),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
         ),
-        sa.Column("is_active", sa.Boolean(), server_default="TRUE", nullable=False),
+        sa.Column(
+            "is_active", sa.Boolean(), server_default="TRUE", nullable=False
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -53,9 +58,14 @@ def upgrade() -> None:
         sa.Column("name", sa.String(length=50), nullable=False),
         sa.Column("description", sa.Text(), nullable=True),
         sa.Column(
-            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
+            "id",
+            sa.Uuid(),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
         ),
-        sa.Column("is_active", sa.Boolean(), server_default="TRUE", nullable=False),
+        sa.Column(
+            "is_active", sa.Boolean(), server_default="TRUE", nullable=False
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -84,9 +94,14 @@ def upgrade() -> None:
         sa.Column("executor_id", sa.Uuid(), nullable=True),
         sa.Column("workspace_id", sa.Uuid(), nullable=False),
         sa.Column(
-            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
+            "id",
+            sa.Uuid(),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
         ),
-        sa.Column("is_active", sa.Boolean(), server_default="TRUE", nullable=False),
+        sa.Column(
+            "is_active", sa.Boolean(), server_default="TRUE", nullable=False
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -99,8 +114,12 @@ def upgrade() -> None:
             server_default=sa.text("TIMEZONE('utc', now())"),
             nullable=False,
         ),
-        sa.ForeignKeyConstraint(["creator_id"], ["users.id"], ondelete="RESTRICT"),
-        sa.ForeignKeyConstraint(["executor_id"], ["users.id"], ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["creator_id"], ["users.id"], ondelete="RESTRICT"
+        ),
+        sa.ForeignKeyConstraint(
+            ["executor_id"], ["users.id"], ondelete="SET NULL"
+        ),
         sa.ForeignKeyConstraint(
             ["workspace_id"], ["workspaces.id"], ondelete="CASCADE"
         ),
@@ -117,9 +136,14 @@ def upgrade() -> None:
             nullable=False,
         ),
         sa.Column(
-            "id", sa.Uuid(), server_default=sa.text("gen_random_uuid()"), nullable=False
+            "id",
+            sa.Uuid(),
+            server_default=sa.text("gen_random_uuid()"),
+            nullable=False,
         ),
-        sa.Column("is_active", sa.Boolean(), server_default="TRUE", nullable=False),
+        sa.Column(
+            "is_active", sa.Boolean(), server_default="TRUE", nullable=False
+        ),
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
@@ -137,7 +161,9 @@ def upgrade() -> None:
             ["workspace_id"], ["workspaces.id"], ondelete="CASCADE"
         ),
         sa.PrimaryKeyConstraint("id"),
-        sa.UniqueConstraint("user_id", "workspace_id", name="unique_workspace_user"),
+        sa.UniqueConstraint(
+            "user_id", "workspace_id", name="unique_workspace_user"
+        ),
     )
     # ### end Alembic commands ###
 
