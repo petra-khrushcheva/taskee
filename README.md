@@ -8,7 +8,7 @@
 ***
 ### Технологии
 Python 3.11  
-FastAPI  
+FastAPI 0.104  
 SQLAlchemy 2.0
 ***
 ### Установка
