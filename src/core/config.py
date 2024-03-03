@@ -18,7 +18,8 @@ class Settings(BaseSettings):
     jwt_lifetime_seconds: int
 
     model_config = SettingsConfigDict(
-        env_file=f"{os.path.dirname(os.path.abspath(__file__))}/../../.env"
+        env_file=f"{os.path.dirname(os.path.abspath(__file__))}/../../.env",
+        extra="ignore"
     )
 
     @property
