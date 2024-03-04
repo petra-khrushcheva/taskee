@@ -48,6 +48,7 @@ class WorkspaceCRUD:
         )
         result = await session.execute(stmt)
         return result.scalar_one_or_none()
+
     # здесь можно будет добавить функционал, показывающий,
     # является ли каррент юзер исполнителем или создателем задачи.
 
@@ -60,7 +61,7 @@ class WorkspaceCRUD:
             .limit(TASKS_PER_WS_FRONT_PAGE_LIMIT)
             .scalar_subquery()
             .correlate(Workspace)
-            )
+        )
         stmt = (
             select(Workspace)
             .join(WorkspaceUserAssociation)
@@ -83,12 +84,11 @@ class WorkspaceCRUD:
     async def update_workspace(
         session: AsyncSession,
         workspace: Workspace,
-        workspace_data: WorkspaceUpdate
+        workspace_data: WorkspaceUpdate,
     ):
-        for key, value in (
-            workspace_data.model_dump(exclude_unset=True)
-            .items()
-        ):
+        for key, value in workspace_data.model_dump(
+            exclude_unset=True
+        ).items():
             setattr(workspace, key, value)
         await session.commit()
         await session.refresh(workspace)
@@ -101,7 +101,7 @@ class WSMembershipCRUD:
     async def add_member_to_ws(
         session: AsyncSession,
         workspace: Workspace,
-        membership: MembershipCreate
+        membership: MembershipCreate,
     ):
         ws_membership = WorkspaceUserAssociation(
             workspace_id=workspace.id, **membership.model_dump()
@@ -116,7 +116,7 @@ class WSMembershipCRUD:
             .join(WorkspaceUserAssociation)
             .where(
                 User.id == user_id,
-                WorkspaceUserAssociation.workspace_id == ws_id
+                WorkspaceUserAssociation.workspace_id == ws_id,
             )
         )
         user: Result = await session.execute(stmt)
@@ -139,12 +139,21 @@ class WSMembershipCRUD:
         stmt = (
             select(User)
             .where(User.id == user.id)
-            .options(selectinload(User.appointed_tasks.and_(
-                Task.workspace_id == workspace.id, Task.executor_id == User.id
-            )))
-            .options(selectinload(User.workspaces.and_(
-                WorkspaceUserAssociation.workspace_id == workspace.id
-            )))
+            .options(
+                selectinload(
+                    User.appointed_tasks.and_(
+                        Task.workspace_id == workspace.id,
+                        Task.executor_id == User.id,
+                    )
+                )
+            )
+            .options(
+                selectinload(
+                    User.workspaces.and_(
+                        WorkspaceUserAssociation.workspace_id == workspace.id
+                    )
+                )
+            )
         )
         result: Result = await session.execute(stmt)
         return result.scalar_one()
@@ -155,9 +164,13 @@ class WSMembershipCRUD:
             select(User)
             .join(WorkspaceUserAssociation)
             .where(WorkspaceUserAssociation.workspace_id == ws_id)
-            .options(selectinload(User.workspaces.and_(
-                WorkspaceUserAssociation.workspace_id == ws_id
-            )))
+            .options(
+                selectinload(
+                    User.workspaces.and_(
+                        WorkspaceUserAssociation.workspace_id == ws_id
+                    )
+                )
+            )
         )
         result: Result = await session.execute(stmt)
         return result.scalars().all()

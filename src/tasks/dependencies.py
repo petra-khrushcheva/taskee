@@ -14,9 +14,9 @@ from src.workspaces.services import WSMembershipCRUD
 
 
 async def get_ws_task_by_id(
-        task_id: Annotated[UUID, Path],
-        ws_id: Annotated[UUID, Path],
-        session: AsyncSession = Depends(get_session)
+    task_id: Annotated[UUID, Path],
+    ws_id: Annotated[UUID, Path],
+    session: AsyncSession = Depends(get_session),
 ):
     task = await TaskCRUD.get_ws_task(
         session=session, task_id=task_id, ws_id=ws_id
@@ -24,16 +24,16 @@ async def get_ws_task_by_id(
     if task is not None:
         return task
     raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"There is no task {task_id} in workspace {ws_id}"
-        )
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"There is no task {task_id} in workspace {ws_id}",
+    )
 
 
 async def is_ws_admin_or_task_creator(
-        ws_id: Annotated[UUID, Path],
-        task: Task = Depends(get_ws_task_by_id),
-        user: User = Depends(current_user),
-        session: AsyncSession = Depends(get_session)
+    ws_id: Annotated[UUID, Path],
+    task: Task = Depends(get_ws_task_by_id),
+    user: User = Depends(current_user),
+    session: AsyncSession = Depends(get_session),
 ):
     if task.creator_id == user.id:
         return task
@@ -43,6 +43,6 @@ async def is_ws_admin_or_task_creator(
     if user_role == GroupRole.admin.value:
         return task
     raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not authorised to perform this action"
-        )
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You are not authorised to perform this action",
+    )

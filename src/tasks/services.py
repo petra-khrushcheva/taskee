@@ -10,14 +10,14 @@ from src.tasks.schemas import TaskCreate
 from src.users.models import User
 
 
-class TaskCRUD():
+class TaskCRUD:
 
     @staticmethod
     async def create_task(
         session: AsyncSession,
         task_data: TaskCreate,
         current_user: User,
-        ws_id: UUID
+        ws_id: UUID,
     ):
         task = Task(
             creator_id=current_user.id,
@@ -41,10 +41,8 @@ class TaskCRUD():
             select(Task)
             .options(
                 joinedload(Task.executor),
-            ).where(
-                Task.id == task_id,
-                Task.workspace_id == ws_id
             )
+            .where(Task.id == task_id, Task.workspace_id == ws_id)
         )
         task: Result = await session.execute(stmt)
         return task.scalar_one_or_none()
@@ -57,9 +55,7 @@ class TaskCRUD():
 
     @staticmethod
     async def update_task(
-        session: AsyncSession,
-        task: Task,
-        task_data: TaskCreate
+        session: AsyncSession, task: Task, task_data: TaskCreate
     ):
         for key, value in task_data.model_dump(exclude_unset=True).items():
             setattr(task, key, value)

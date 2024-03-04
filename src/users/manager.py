@@ -19,7 +19,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
     verification_token_secret = SECRET
 
     async def on_after_register(
-            self, user: User, request: Optional[Request] = None
+        self, user: User, request: Optional[Request] = None
     ):
         print(f"User {user.id} has registered.")
 

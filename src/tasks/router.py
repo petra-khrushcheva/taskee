@@ -18,10 +18,8 @@ router = APIRouter(prefix="/workspaces/{ws_id}/tasks", tags=["Tasks"])
 
 
 @router.post(
-        "/",
-        status_code=status.HTTP_201_CREATED,
-        response_model=TaskWithExecutor
-    )
+    "/", status_code=status.HTTP_201_CREATED, response_model=TaskWithExecutor
+)
 async def create_task(
     ws_id: UUID,
     task_data: TaskCreate,
@@ -40,15 +38,15 @@ async def create_task(
         session=session,
         task_data=task_data,
         current_user=current_user,
-        ws_id=ws_id
+        ws_id=ws_id,
     )
 
 
 @router.get(
-        "/{task_id}",
-        response_model=TaskWithExecutor,
-        dependencies=[Depends(is_ws_user)]
-    )
+    "/{task_id}",
+    response_model=TaskWithExecutor,
+    dependencies=[Depends(is_ws_user)],
+)
 async def get_task(task: TaskRead = Depends(get_ws_task_by_id)):
     """
     Route for retrieving a single task.
@@ -74,11 +72,11 @@ async def delete_task(
 
 
 @router.put(
-        "/{task_id}",
-        status_code=status.HTTP_200_OK,
-        response_model=TaskWithExecutor,
-        dependencies=[Depends(is_ws_admin)],
-    )
+    "/{task_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=TaskWithExecutor,
+    dependencies=[Depends(is_ws_admin)],
+)
 async def update_task(
     ws_id: UUID,
     task_data: TaskUpdate,

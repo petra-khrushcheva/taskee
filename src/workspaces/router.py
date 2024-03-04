@@ -26,8 +26,8 @@ membership_router = APIRouter(
 
 
 @ws_router.post(
-        "/", status_code=status.HTTP_201_CREATED, response_model=WorkspaceRead
-    )
+    "/", status_code=status.HTTP_201_CREATED, response_model=WorkspaceRead
+)
 async def create_workspace(
     ws_data: WorkspaceCreate,
     session: AsyncSession = Depends(get_session),
@@ -44,10 +44,10 @@ async def create_workspace(
 
 
 @ws_router.get(
-        "/{ws_id}",
-        response_model=WorkspaceWithTasks,
-        dependencies=[Depends(is_ws_member)]
-    )
+    "/{ws_id}",
+    response_model=WorkspaceWithTasks,
+    dependencies=[Depends(is_ws_member)],
+)
 async def get_workspace(
     ws_id: UUID,
     session: AsyncSession = Depends(get_session),
@@ -58,14 +58,15 @@ async def get_workspace(
     Avaliable for any member of that workspace
     """
     return await WorkspaceCRUD.get_workspace_with_tasks(
-        session=session, ws_id=ws_id,  # current_user=current_user
+        session=session,
+        ws_id=ws_id,  # current_user=current_user
     )
 
 
 @ws_router.get("/", response_model=List[WorkspaceWithTasks])
 async def get_workspaces(
     session: AsyncSession = Depends(get_session),
-    current_user: UserRead = Depends(current_user)
+    current_user: UserRead = Depends(current_user),
 ):
     """
     Route for retrieving all workspaces of a current user
@@ -79,13 +80,13 @@ async def get_workspaces(
 
 
 @ws_router.delete(
-        "/{ws_id}",
-        status_code=status.HTTP_204_NO_CONTENT,
-        dependencies=[Depends(is_ws_admin)]
-    )
+    "/{ws_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(is_ws_admin)],
+)
 async def delete_workspace(
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Route for deleting a workspace.
@@ -97,15 +98,15 @@ async def delete_workspace(
 
 
 @ws_router.put(
-        "/{ws_id}",
-        status_code=status.HTTP_200_OK,
-        response_model=WorkspaceRead,
-        dependencies=[Depends(is_ws_admin)]
-    )
+    "/{ws_id}",
+    status_code=status.HTTP_200_OK,
+    response_model=WorkspaceRead,
+    dependencies=[Depends(is_ws_admin)],
+)
 async def update_workspace(
     workspace_data: WorkspaceUpdate,
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Route for updating workspace information,
@@ -113,41 +114,38 @@ async def update_workspace(
     Avaliable for any workspace admin.
     """
     return await WorkspaceCRUD.update_workspace(
-        session=session,
-        workspace=workspace,
-        workspace_data=workspace_data
+        session=session, workspace=workspace, workspace_data=workspace_data
     )
 
 
 @membership_router.post(
-    "/", status_code=status.HTTP_201_CREATED,
-    dependencies=[Depends(is_ws_admin)]
+    "/",
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(is_ws_admin)],
 )
 async def add_member_to_workspace(
     membership: MembershipCreate,
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Route for adding user to workspace.
     Avaliable for any admin of that workspace.
     """
     return await WSMembershipCRUD.add_member_to_ws(
-        session=session,
-        workspace=workspace,
-        membership=membership
+        session=session, workspace=workspace, membership=membership
     )
 
 
 @membership_router.get(
-        "/{user_id}",
-        response_model=UserWithTasks,
-        dependencies=[Depends(is_ws_member)]
-    )
+    "/{user_id}",
+    response_model=UserWithTasks,
+    dependencies=[Depends(is_ws_member)],
+)
 async def get_workspace_member(
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
     user: UserRead = Depends(get_ws_user_by_id),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Route for retrieving any workspace member
@@ -155,20 +153,17 @@ async def get_workspace_member(
     Avaliable for any member of that workspace.
     """
     return await WSMembershipCRUD.get_ws_user_with_tasks(
-        session=session,
-        workspace=workspace,
-        user=user
+        session=session, workspace=workspace, user=user
     )
 
 
 @membership_router.get(
-        "/",
-        response_model=List[WorkspaceUser],
-        dependencies=[Depends(is_ws_member)]
-    )
+    "/",
+    response_model=List[WorkspaceUser],
+    dependencies=[Depends(is_ws_member)],
+)
 async def get_all_workspace_members(
-    ws_id: UUID,
-    session: AsyncSession = Depends(get_session)
+    ws_id: UUID, session: AsyncSession = Depends(get_session)
 ):
     """
     Route for retrieving all workspace members
@@ -181,23 +176,21 @@ async def get_all_workspace_members(
 
 
 @membership_router.delete(
-        "/{user_id}",
-        status_code=status.HTTP_204_NO_CONTENT,
-        dependencies=[Depends(is_admin_or_self)]
-    )
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(is_admin_or_self)],
+)
 async def delete_member_from_workspace(
     user: UserRead = Depends(get_ws_user_by_id),
     workspace: WorkspaceRead = Depends(get_workspace_by_id),
-    session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Route for deleting user from workspace.
     Avaliable for admin of that workspace or user themselves.
     """
     return await WSMembershipCRUD.delete_member_from_ws(
-        session=session,
-        user=user,
-        workspace=workspace
+        session=session, user=user, workspace=workspace
     )
     # добавить запрет на удаление единственного админа
 
@@ -205,7 +198,7 @@ async def delete_member_from_workspace(
 @membership_router.put(
     "/{user_id}",
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(is_ws_admin)]
+    dependencies=[Depends(is_ws_admin)],
 )
 async def update_workspace_user_role(
     updated_user_status: MembershipUpdate,
@@ -221,5 +214,5 @@ async def update_workspace_user_role(
         session=session,
         workspace=workspace,
         updated_user_status=updated_user_status,
-        user=user
+        user=user,
     )

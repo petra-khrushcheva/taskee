@@ -12,9 +12,7 @@ from src.workspaces.services import WorkspaceCRUD, WSMembershipCRUD
 
 
 async def is_user_in_workspace(
-        user_id: UUID,
-        ws_id: UUID,
-        session: AsyncSession = Depends(get_session)
+    user_id: UUID, ws_id: UUID, session: AsyncSession = Depends(get_session)
 ):
     """
     Checks if user is associated with workspace in any role.
@@ -25,15 +23,15 @@ async def is_user_in_workspace(
     if user is not None:
         return user
     raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"There is no user {user_id} in workspace {ws_id}"
-        )
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail=f"There is no user {user_id} in workspace {ws_id}",
+    )
 
 
 async def is_ws_member(
-        ws_id: Annotated[UUID, Path],
-        user: User = Depends(current_user),
-        session: AsyncSession = Depends(get_session),
+    ws_id: Annotated[UUID, Path],
+    user: User = Depends(current_user),
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Checks if current user is associated with workspace in any role.
@@ -45,9 +43,9 @@ async def is_ws_member(
 
 
 async def is_ws_admin(
-        ws_id: Annotated[UUID, Path],
-        user: User = Depends(is_ws_member),
-        session: AsyncSession = Depends(get_session)
+    ws_id: Annotated[UUID, Path],
+    user: User = Depends(is_ws_member),
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Checks if current user has admin rights.
@@ -58,15 +56,15 @@ async def is_ws_admin(
     if user_role == GroupRole.admin.value:
         return user
     raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not authorised to perform this action"
-        )
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You are not authorised to perform this action",
+    )
 
 
 async def is_ws_user(
-        ws_id: Annotated[UUID, Path],
-        user: User = Depends(is_ws_member),
-        session: AsyncSession = Depends(get_session)
+    ws_id: Annotated[UUID, Path],
+    user: User = Depends(is_ws_member),
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Checks if current user has workspace user rights.
@@ -78,16 +76,16 @@ async def is_ws_user(
     if user_role != GroupRole.reader.value:
         return user
     raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You are not authorised to perform this action"
-        )
+        status_code=status.HTTP_403_FORBIDDEN,
+        detail="You are not authorised to perform this action",
+    )
 
 
 async def is_admin_or_self(
-        user_id: Annotated[UUID, Path],
-        ws_id: Annotated[UUID, Path],
-        session: AsyncSession = Depends(get_session),
-        user: User = Depends(is_ws_member)
+    user_id: Annotated[UUID, Path],
+    ws_id: Annotated[UUID, Path],
+    session: AsyncSession = Depends(get_session),
+    user: User = Depends(is_ws_member),
 ):
     if user.id == user_id:
         return user
@@ -95,22 +93,21 @@ async def is_admin_or_self(
 
 
 async def get_workspace_by_id(
-        ws_id: Annotated[UUID, Path],
-        session: AsyncSession = Depends(get_session)
+    ws_id: Annotated[UUID, Path], session: AsyncSession = Depends(get_session)
 ):
     workspace = await WorkspaceCRUD.get_workspace(session=session, ws_id=ws_id)
     if workspace is not None:
         return workspace
     raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="This workspace does not exist"
-        )
+        status_code=status.HTTP_404_NOT_FOUND,
+        detail="This workspace does not exist",
+    )
 
 
 async def get_ws_user_by_id(
-        user_id: Annotated[UUID, Path],
-        ws_id: Annotated[UUID, Path],
-        session: AsyncSession = Depends(get_session)
+    user_id: Annotated[UUID, Path],
+    ws_id: Annotated[UUID, Path],
+    session: AsyncSession = Depends(get_session),
 ):
     """
     Checks if user declared in the path

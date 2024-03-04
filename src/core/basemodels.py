@@ -11,7 +11,7 @@ class Base(DeclarativeBase):
     id: Mapped[uuid.UUID] = mapped_column(
         primary_key=True,
         default=uuid.uuid4,
-        server_default=text("gen_random_uuid()")
+        server_default=text("gen_random_uuid()"),
     )
     is_active: Mapped[bool] = mapped_column(
         default=True, server_default="TRUE"

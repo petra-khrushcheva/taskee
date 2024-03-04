@@ -14,15 +14,14 @@ class Workspace(Base):
     description: Mapped[str | None] = mapped_column(Text)
 
     users: Mapped[list["WorkspaceUserAssociation"]] = relationship(
-        back_populates="workspace",
-        cascade="all, delete"
+        back_populates="workspace", cascade="all, delete"
     )
     tasks: Mapped[list["Task"]] = relationship(  # noqa: F821
         back_populates="workspace",
         primaryjoin=(
             "and_(Workspace.id==Task.workspace_id, Task.is_active==True)"
         ),
-        order_by="Task.created_at.desc()"
+        order_by="Task.created_at.desc()",
     )
 
 
@@ -61,8 +60,7 @@ class WorkspaceUserAssociation(Base):
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False
     )
     user_role: Mapped[GroupRole] = mapped_column(
-        default=GroupRole.user.value,
-        server_default=GroupRole.user.value
+        default=GroupRole.user.value, server_default=GroupRole.user.value
     )
 
     workspace: Mapped["Workspace"] = relationship(

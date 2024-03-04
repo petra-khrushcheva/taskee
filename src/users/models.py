@@ -22,10 +22,8 @@ class User(Base, SQLAlchemyBaseUserTableUUID):
         order_by="desc(Task.created_at)",
     )
 
-    workspaces: Mapped[
-        list["WorkspaceUserAssociation"]  # noqa: F821
-    ] = relationship(
-        back_populates="user", cascade="all, delete"
+    workspaces: Mapped[list["WorkspaceUserAssociation"]] = (  # noqa: F821
+        relationship(back_populates="user", cascade="all, delete")
     )
     user_role: AssociationProxy[list[str]] = association_proxy(
         "workspaces", "user_role"
