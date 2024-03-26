@@ -1,9 +1,12 @@
-from fastapi_users.authentication import (AuthenticationBackend,
-                                          BearerTransport, JWTStrategy)
+from fastapi_users.authentication import (
+    AuthenticationBackend,
+    BearerTransport,
+    JWTStrategy,
+)
 
 from src.core.config import settings
 
-SECRET = settings.secret_key
+SECRET = settings.secret_key.get_secret_value()
 
 
 bearer_transport = BearerTransport(tokenUrl="v1/auth/jwt/login")

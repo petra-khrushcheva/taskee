@@ -11,7 +11,7 @@ from src.core.database import get_session
 from src.users.auth import auth_backend
 from src.users.models import User
 
-SECRET = settings.secret_key
+SECRET = settings.secret_key.get_secret_value()
 
 
 class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):

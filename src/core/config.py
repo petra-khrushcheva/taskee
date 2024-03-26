@@ -1,6 +1,7 @@
 import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import SecretStr
 
 
 class Settings(BaseSettings):
@@ -11,7 +12,7 @@ class Settings(BaseSettings):
     db_username: str
     db_echo: bool
 
-    secret_key: str
+    secret_key: SecretStr
 
     project_name: str
     project_version: str
