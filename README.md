@@ -9,7 +9,10 @@
 ### Технологии
 Python 3.11  
 FastAPI 0.104  
-SQLAlchemy 2.0
+SQLAlchemy 2.0  
+Pydantic 2.5  
+Alembic 1.13  
+PostgreSQL  
 ***
 ### Установка
 - Клонируйте проект:

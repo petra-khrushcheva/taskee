@@ -71,7 +71,6 @@ class WorkspaceCRUD:
         )
         result: Result = await session.execute(stmt)
         workspaces = result.unique().scalars().all()
-        print(list(workspaces))
         return list(workspaces)
 
     @staticmethod

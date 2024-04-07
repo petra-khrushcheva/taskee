@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.database import get_session
+from src.core import get_session
 from src.users.dependencies import current_active_user as current_user
 from src.users.schemas import UserRead
 from src.workspaces.dependencies import (get_workspace_by_id,

@@ -4,7 +4,7 @@ from uuid import UUID
 from fastapi import Depends, HTTPException, Path, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.core.database import get_session
+from src.core import get_session
 from src.tasks.models import Task
 from src.tasks.services import TaskCRUD
 from src.users.dependencies import current_active_user as current_user
