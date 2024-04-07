@@ -23,24 +23,7 @@ git clone git@github.com:petra-khrushcheva/taskee_2_0.git
 ```
 cd taskee_2_0
 ``` 
-- Cоздайте .env файл по образцу:
-```
-DB_HOSTNAME=
-DB_PORT=
-DB_USERNAME=
-DB_PASSWORD=
-DB_NAME=
-DB_ECHO=False
-SECRET_KEY=
-
-PROJECT_NAME='Taskee - таск трекер'
-PROJECT_VERSION="0.2.0"
-JWT_LIFETIME_SECONDS=2592000 #1 month
-
-PGADMIN_EMAIL=
-PGADMIN_PASSWORD=
-
-``` 
+- Cоздайте переменные окружения по [образцу](https://github.com/petra-khrushcheva/taskee_2_0/blob/main/.env.example).
 - Запустите Docker-compose:
 ```
 docker compose -f docker-compose-dev.yml up
