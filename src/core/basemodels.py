@@ -22,5 +22,5 @@ class Base(DeclarativeBase):
     updated_at: Mapped[datetime.datetime] = mapped_column(
         DateTime(timezone=True),
         server_default=text("TIMEZONE('utc', now())"),
-        onupdate=datetime.datetime.utcnow,
+        onupdate=datetime.datetime.now(datetime.UTC),
     )
