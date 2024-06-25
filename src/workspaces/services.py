@@ -7,10 +7,17 @@ from sqlalchemy.orm import contains_eager, selectinload
 
 from src.tasks.models import Task
 from src.users.models import User
-from src.workspaces.models import (GroupRole, Workspace,
-                                   WorkspaceUserAssociation)
-from src.workspaces.schemas import (MembershipCreate, MembershipUpdate,
-                                    WorkspaceCreate, WorkspaceUpdate)
+from src.workspaces.models import (
+    GroupRole,
+    Workspace,
+    WorkspaceUserAssociation,
+)
+from src.workspaces.schemas import (
+    MembershipCreate,
+    MembershipUpdate,
+    WorkspaceCreate,
+    WorkspaceUpdate,
+)
 
 TASKS_PER_WS_FRONT_PAGE_LIMIT = 4
 
